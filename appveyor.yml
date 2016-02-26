@@ -8,19 +8,6 @@ environment:
 services:
   - postgresql93
 
-install:
-  - ps: Start-FileDownload "https://static.rust-lang.org/dist/${env:RUST_VERSION}/rust-nightly-${env:TARGET}.exe"
-  - rust-nightly-%TARGET%.exe /VERYSILENT /NORESTART /DIR="C:\Program Files (x86)\Rust"
-  - SET PATH=%PATH%;C:\Program Files (x86)\Rust\bin
-  - SET PATH=%PATH%;C:\MinGW\bin
-  - SET PATH=%PATH%;C:\Program Files\PostgreSQL\9.3\bin\
-  - SET PGUSER=postgres
-  - SET PGPASSWORD=Password12!
-  - psql -c 'create database nestedworld_tests;' -U postgres
-  - psql -c 'create extension postgis;' -U postgres -d nestedworld_tests
-  - rustc -V
-  - cargo -V
-
 notifications:
 - provider: Slack
   incoming_webhook:
@@ -29,5 +16,18 @@ notifications:
 
 build: false
 
+install:
+  - ps: Start-FileDownload "https://static.rust-lang.org/dist/${env:RUST_VERSION}/rust-nightly-${env:TARGET}.exe"
+  - rust-nightly-%TARGET%.exe /VERYSILENT /NORESTART /DIR="C:\Program Files (x86)\Rust"
+  - SET PATH=%PATH%;C:\Program Files (x86)\Rust\bin
+  - SET PATH=%PATH%;C:\MinGW\bin
+  - SET PATH=%PATH%;C:\Program Files\PostgreSQL\9.3\bin\
+  - rustc -V
+  - cargo -V
+before_test:
+  - SET PGUSER=postgres
+  - SET PGPASSWORD=Password12!
+  - psql -c 'create database nestedworld_tests;' -U postgres
+  - psql -c 'create extension postgis;' -U postgres -d nestedworld_tests
 test_script:
   - mingw32-make test
