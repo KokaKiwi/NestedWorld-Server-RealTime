@@ -1,5 +1,6 @@
 environment:
   DATABASE_URL: postgres://postgres:Password12!@localhost:5432/nestedworld_tests
+  PGPASSWORD: Password12!
   RUST_VERSION: 2016-02-25
   matrix:
   - TARGET: x86_64-pc-windows-msvc
@@ -25,9 +26,7 @@ install:
   - rustc -V
   - cargo -V
 before_test:
-  - SET PGUSER=postgres
-  - SET PGPASSWORD=Password12!
-  - psql -c 'create database nestedworld_tests;' -U postgres
-  - psql -c 'create extension postgis;' -U postgres -d nestedworld_tests
+  - psql -U postgres -c 'create database nestedworld_tests'
+  - psql -U postgres -d nestedworld_tests -c 'create extension postgis'
 test_script:
   - mingw32-make test
