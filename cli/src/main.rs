@@ -1,5 +1,4 @@
 #[macro_use] extern crate clap;
-extern crate ctrlc;
 #[macro_use] extern crate log;
 extern crate log4rs;
 extern crate nestedworld_server as server;
@@ -11,6 +10,7 @@ extern crate toml_config;
 mod config;
 
 use config::Config;
+use server::{Config as ServerConfig, ServerLoop};
 use std::default::Default;
 
 fn main() {
@@ -26,4 +26,13 @@ fn main() {
 
     let config_file = matches.value_of("CONFIG_FILE").unwrap_or("conf/config.toml");
     let config = Config::load(config_file);
+
+    // Start server
+    let server_config = ServerConfig {
+        listen: config.server.listen(),
+    };
+    let server_loop = ServerLoop::new(server_config).unwrap();
+    let handle = server_loop.start();
+
+    handle.join().unwrap();
 }
