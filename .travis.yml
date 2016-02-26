@@ -10,4 +10,7 @@ notifications:
     slack:
         secure: G1pGeor8Q87/v83eJ0K4JI9El3pH9BEIOucPwQqdGG91nGSOQKLqD/gk/N+3t8xCJbbTnp4Qwog6fgC33VS35dJsg/6IYXgC4UkmomIFD4oI2zHhlQbvUZuCJQcgQ0JYobfWgEhl5rVRLBgVHwJkwLqDaA90IkwNrqi4vaZHN5LGunZ/tp7vm4LBCJTAjxY6A7Ouw2IyqdwywdMas1OpVTWxM8nXpuWjgSAt6ZOvlcQVGGT3ajLqOWkKyJDbaj6qm3AtPNvyFcU5ZhRn+SjOXedLa+78fLUcJJLvAYLQsehMG9h8zCtwyq0E6WfO/exSPzLPx4ZwGrpcA5lQKK9qz5LOMEsyXMTiRq+ACIpD84t9/Wx5cK+Op9MgoEygKaiFYN2arGi7EgJvqUDbYxQHFJdV+nrGLJ0YWKjW5qCvTHQI5sg3AJToI+yzoVvOl6LOviVro5/BcqNJ1spVmFe/9KrU1vl9zmwN9MaKWGXcDtbXARObqHuCM4B85uPwjLczIvq5K1vtd/unudiSYOUX8C/B4giF7eC7J/3C+BLVTByHL54wJbTxCsTsMKwvm8uVxjvp9p1Vi0eW+Y7pMJC0EbWO0m9T759f8kvLY8vOLSQIkYEe0vZR5EwVMVLxzW9Tk38bfUvxi86DJPlBPRYx5b8h9UQYTvbqxe/lmVMe7zE=
 
+before_script:
+  - psql -c 'create database nestedworld_tests;' -U postgres
+
 script: make test
