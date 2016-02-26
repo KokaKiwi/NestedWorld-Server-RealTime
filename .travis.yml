@@ -1,6 +1,10 @@
 language: rust
+addons:
+    postgresql: 9.3
 rust:
     - nightly-2016-02-25
+services:
+    - postgresql
 
 notifications:
     slack:
