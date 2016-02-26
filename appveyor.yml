@@ -26,7 +26,7 @@ install:
   - rustc -V
   - cargo -V
 before_test:
-  - psql -U postgres -c 'create database nestedworld_tests'
-  - psql -U postgres -d nestedworld_tests -c 'create extension postgis'
+  - psql -U postgres -c "create database nestedworld_tests;"
+  - psql -U postgres -d nestedworld_tests -c "create extension postgis;"
 test_script:
   - mingw32-make test
