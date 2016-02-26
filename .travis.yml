@@ -1,6 +1,6 @@
 language: rust
 rust:
-    - nightly-2016-02-22
+    - nightly-2016-02-25
 
 notifications:
     slack:
