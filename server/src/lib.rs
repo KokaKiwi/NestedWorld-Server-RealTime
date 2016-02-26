@@ -1,6 +1,6 @@
 #[macro_use] extern crate chan;
 #[macro_use] extern crate log;
-extern crate mioco;
+extern crate mio;
 extern crate nestedworld_db;
 #[macro_use] extern crate quick_error;
 

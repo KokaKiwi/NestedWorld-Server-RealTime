@@ -13,6 +13,5 @@ rustc-serialize = "0.3.18"
 toml-config = "0.2.0"
 
 [dependencies.clap]
-git = "https://github.com/kbknapp/clap-rs"
-rev = "a5ceee21b5d29c261d2acf12e825b0b91c2fc327"
+version = "2.1.2"
 features = ["nightly", "unstable"]
