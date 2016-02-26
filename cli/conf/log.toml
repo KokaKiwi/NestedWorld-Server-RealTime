@@ -1,0 +1,32 @@
+# Scan this file for changes every 30 seconds
+refresh_rate = 30
+
+# An appender named "stdout" that writes to stdout
+[appender.stdout]
+kind = "console"
+pattern = "[%l] %M (%f:%L) - %m"
+
+# Database logs
+[appender.db]
+kind = "file"
+path = "logs/db.log"
+pattern = "%d - %l - %M (%f:%L) - %m"
+
+# Server logs
+[appender.server]
+kind = "file"
+path = "logs/server.log"
+
+[root]
+level = "info"
+appenders = ["stdout"]
+
+[[logger]]
+name = "nestedworld_db"
+level = "info"
+appenders = ["db"]
+
+[[logger]]
+name = "nestedworld_server"
+level = "info"
+appenders = ["server"]

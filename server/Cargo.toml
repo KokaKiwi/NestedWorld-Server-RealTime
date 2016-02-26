@@ -1,0 +1,14 @@
+[package]
+name = "nestedworld-server"
+version = "0.1.0"
+authors = ["KokaKiwi <kokakiwi@kokakiwi.net>"]
+
+[dependencies]
+chan = "0.1.14"
+log = "0.3.5"
+nestedworld-db = { path = "../db" }
+quick-error = "1.0.0"
+
+[dependencies.mioco]
+git = "https://github.com/dpc/mioco"
+rev = "4f491dc974f5afd872d64cc89bae21678f319fe7"

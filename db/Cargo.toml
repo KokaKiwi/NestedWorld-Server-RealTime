@@ -1,0 +1,11 @@
+[package]
+name = "nestedworld-db"
+version = "0.1.0"
+authors = ["KokaKiwi <kokakiwi@kokakiwi.net>"]
+
+[dependencies]
+log = "0.3.5"
+postgres = "0.11.3"
+quick-error = "1.0.0"
+r2d2 = "0.6.3"
+r2d2_postgres = "0.10.0"

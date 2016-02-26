@@ -1,0 +1,13 @@
+# Rust stuff
+target
+Cargo.lock
+
+# Doc stuff
+doc/*.html
+README.html
+
+# Misc stuff
+.*
+!.dummy
+!.gitignore
+!.travis.yml

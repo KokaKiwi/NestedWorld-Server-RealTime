@@ -1,0 +1,26 @@
+= NestedWorld - Real-time server
+Guillaume HERVIER <guillaume.hervier@epitech.eu>; Aude LEJUEZ <aude.lejuez@epitech.eu>
+:toc: left
+:version: 0.1.0
+:rustversion: nightly
+
+== Build environment
+
+You need `multirust` to manage your Rust environment, which is available here: https://github.com/brson/multirust
+
+TIP: There is an `AUR` package for Arch Linux: https://aur.archlinux.org/packages/multirust
+
+When you installed `multirust`, you need a specific Rust version for this project, which you can use by "overriding"
+the Rust version for this project directory by using `multirust override <rust version>`
+
+Actually, the needed Rust version is `{rustversion}`, which you can use by typing: `multirust override {rustversion}`
+
+== Project rules
+
+=== Versions
+
+You *must* use specific versions of libraries and compiler, in order to avoid breaking changes problems.
+
+NOTE: If using git URL for a library, specify the commit!
+
+== Why not use stable Rust?

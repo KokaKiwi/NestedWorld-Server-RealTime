@@ -1,0 +1,5 @@
+language: rust
+rust:
+    - nightly-2016-02-22
+
+script: make test

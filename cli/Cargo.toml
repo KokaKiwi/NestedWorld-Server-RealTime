@@ -1,0 +1,18 @@
+[package]
+name = "nestedworld-cli"
+version = "0.1.0"
+authors = ["KokaKiwi <kokakiwi@kokakiwi.net>"]
+
+[dependencies]
+ctrlc = "1.1.1"
+log = "0.3.5"
+log4rs = "0.3.3"
+nestedworld-server = { path = "../server" }
+quick-error = "1.0.0"
+rustc-serialize = "0.3.18"
+toml-config = "0.2.0"
+
+[dependencies.clap]
+git = "https://github.com/kbknapp/clap-rs"
+rev = "a5ceee21b5d29c261d2acf12e825b0b91c2fc327"
+features = ["nightly", "unstable"]
