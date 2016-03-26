@@ -4,6 +4,8 @@ Guillaume HERVIER <guillaume.hervier@epitech.eu>; Aude LEJUEZ <aude.lejuez@epite
 :version: 0.1.0
 :rustversion: nightly
 
+Protocol documentation: http://eip.kokakiwi.net/doc/protocol.html
+
 == Build environment
 
 You need `multirust` to manage your Rust environment, which is available here: https://github.com/brson/multirust
