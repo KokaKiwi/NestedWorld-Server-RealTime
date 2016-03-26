@@ -2,6 +2,7 @@
 target
 
 # Doc stuff
+doc/*.sh
 doc/*.html
 README.html
 

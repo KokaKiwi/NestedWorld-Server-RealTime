@@ -1,0 +1,465 @@
+= Combat
+
+== States
+
+[[state-combat]]
+=== `combat`
+
+A message with the state `combat` contains informations about a combat context.
+
+.Fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `combat`   | `integer`  | *(required)* The current combat ID sent with the `<<msg-combat-start,combat:start>>` packet
+
+|===
+
+.Errors
+* `InvalidCombat`: Generated when using a nonexistent combat ID, or when the user is not in the corresponding combat.
+
+== Structures
+
+[[struct-combat-monster]]
+=== `combat:Monster`
+
+.Fields
+[cols="15,20,65"]
+|===
+| Field name        | Field type | Description
+
+| `id`              | `integer`  | *(required)* Monster ID
+| `name`            | `string`   | *(required)* Monster name
+| `monster_id`      | `integer`  | *(required)* Monster ID usable in the HTTP API
+| `user_monster_id` | `integer`  | *(optional)* UserMonster ID usable in the HTTP API +
+                                   Represent the instance of the monster in the user's team. +
+                                   This ID is present only for the client monsters
+| `hp`              | `integer`  | *(required)* Actual monster's HP
+| `level`           | `integer`  | *(required)* Actual monster's level
+
+
+|===
+
+.Example
+[source,json]
+----
+{
+    "id": 1,
+    "name": "Nibbler",
+    "monster_id": 3,
+    "user_monster_id": 8,
+    "hp": 120,
+    "level": 4
+}
+----
+
+[[struct-combat-user]]
+=== `combat:User`
+
+.Fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `id`       | `integer`  | *(required)* User ID
+| `name`     | `string`   | *(required)* User name (`pseudo`)
+
+|===
+
+.Example
+[source,json]
+----
+{
+    "id": 5,
+    "name": "KokaKiwi"
+}
+----
+
+== Messages
+
+[[msg-combat-available]]
+=== `combat:available`
+
+****
+icon:envelope[] `SERVER-ONLY`
+****
+
+This message is sent by the server to notify the client a combat is available
+and ask for confirmation to start it.
+
+.Request fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `origin`   | `string`   | *(required)* The origin of the combat request. +
+                            See below for the possible values and the fields associated.
+
+|===
+
+.`wild-monster`
+[cols="15,20,65"]
+|===
+| Field name   | Field type | Description
+
+| `monster_id` | `integer`  | *(required)* Monster ID usable in the HTTP API
+
+|===
+
+.`duel`
+[cols="15,20,65"]
+|===
+| Field name   | Field type                           | Description
+
+| `user`       | `<<struct-combat-user,combat:User>>` | *(required)* The user who request the duel
+
+|===
+
+.Response fields
+[cols="15,20,65"]
+|===
+| Field name   | Field type | Description
+
+| `accept`     | `boolean`  | *(required)* If the user accept or no the combat request.
+
+|===
+
+[[msg-combat-start]]
+=== `combat:start`
+
+****
+icon:envelope[] `SERVER-ONLY`, `NO RESPONSED NEEDED`
+****
+
+.Request fields
+[cols="15,20,65"]
+|===
+| Field name | Field type                                                   | Description
+
+| `id`       | `integer`                                                    | *(required)* Combat ID
+| `user`     | `<<msg-combat-start-struct-user,combat:start:User>>`         | *(required)* Informations about user's side.
+| `opponent` | `<<msg-combat-start-struct-opponent,combat:start:Opponent>>` | *(required)* Informations about opponent's side.
+| `type`     | `string`                                                     | *(required)* Combat type:
+                                                                              `wild`, `dungeon` or `duel`
+| `env`      | `string`                                                     | *(required)* Combat environment:
+                                                                              `city`, `dungeon`, `campaign`, `sea`, etc.
+| `first`    | `boolean`                                                    | *(required)* Is the user first to move?
+
+|===
+
+NOTE: TODO: Describe all environments
+
+[[msg-combat-start-struct-user]]
+.`combat:start:User`
+[cols="15,20,65"]
+|===
+| Field name | Field type                                 | Description
+
+| `monster`  | `<<struct-combat-monster,combat:Monster>>` | *(required)* Current monster
+
+|===
+
+[[msg-combat-start-struct-opponent]]
+.`combat:start:Opponent`
+[cols="15,20,65"]
+|===
+| Field name       | Field type                                 | Description
+
+| `monster`        | `<<struct-combat-monster,combat:Monster>>` | *(required)* Current monster. +
+                                                                  Does not have the `user_monster_id` field.
+| `monsters_count` | `integer`                                  | *(required)* Total number of monsters the opponent have.
+| `user`           | `<<struct-combat-user,combat:User>>`       | *(optional)* Opponent's owner, present if `type` is `duel`.
+
+|===
+
+.Example
+[source,json]
+----
+{
+    "type": "combat:start",
+    "id": 1,
+    "user": {
+        "monster": {
+            "id": 1,
+            "name": "Nibbler",
+            "monster_id": 3,
+            "user_monster_id": 8,
+            "hp": 120,
+            "level": 4
+        }
+    },
+    "opponent": {
+        "monster": {
+            "id": 1,
+            "name": "Nibbler",
+            "monster_id": 3,
+            "hp": 70,
+            "level": 2
+        },
+        "monsters_count": 6,
+        "user": {
+            "id": 2,
+            "name": "Kennie McCormick"
+        }
+    },
+    "type": "duel",
+    "env": "city",
+    "first": true
+}
+----
+
+[[msg-combat-send-attack]]
+=== `combat:send-attack`
+
+****
+icon:envelope[] `CLIENT-ONLY`
+
+icon:book[] `States: <<state-authenticated,authenticated>> <<state-combat,combat>>`
+****
+
+This message is sent by the client to tell the server the current user's monster attack.
+
+The user may send this message even if he is not the first to move, as the order of attacks will be
+evaluated server-side.
+
+But sending this message multiple times before the server applied the first sent attack will generate
+an error.
+
+.Request fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `target`   | `integer`  | *(required)* Target's monster ID
+| `attack`   | `integer`  | *(required)* Attack ID to send
+
+|===
+
+.Errors
+* `InvalidTarget`: Nonexistent target or not a valid target (in case the user send his own monster?)
+* `InvalidAttack`: Nonexistent attack or not in the user's monster attacks list.
+* `AlreadySent`: The user has sent an attack which hasn't been processed yet.
+
+[[msg-combat-attack-received]]
+=== `combat:attack-received`
+
+****
+icon:envelope[] `SERVER-ONLY`, `NO RESPONSE NEEDED`
+
+icon:book[] `States: <<state-combat,combat>>`
+****
+
+This message is sent by the server when it has processed an attack sent by one of the combat's participants.
+
+.Fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `attack`   | `integer`  | *(required)* The attack ID sent
+
+| `monster`
+| `<<msg-combat-attack-received-struct-monster,combat:attack-received:Monster>>`
+| *(required)* The attacker monster new informations
+
+| `target`
+| `<<msg-combat-attack-received-struct-monster,combat:attack-received:Monster>>`
+| *(required)* The attacked monster new informations
+
+|===
+
+[[msg-combat-attack-received-struct-monster]]
+.`combat:attack-received:Monster`
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `id`       | `integer`  | *(required)* Monster ID
+| `hp`       | `integer`  | *(required)* The monster's new HP value
+
+|===
+
+.Example
+[source,json]
+----
+{
+    "type": "combat:attack-received",
+    "combat": 1,
+    "attack": 22,
+    "monster": {
+        "id": 2,
+        "hp": 70
+    },
+    "target": {
+        "id": 3,
+        "hp": 40
+    }
+}
+----
+
+[[msg-combat-monster-ko]]
+=== `combat:monster-ko`
+
+****
+icon:envelope[] `SERVER-ONLY`
+
+icon:book[] `States: <<state-combat,combat>>`
+****
+
+This message is sent by the server when one of the monsters participating in the combat is KO.
+
+If the KO monster was in the client side and there is other monsters available in client's team,
+then he _MUST_ send back a <<msg-combat-monster-ko-replace>> or <<msg-combat-flee>> message as response.
+
+If the KO monster was in the opponent side and the combat's type is `wild`, then the client
+_MUST_ send back a <<msg-combat-monster-ko-capture>> message as response.
+
+Otherwise, no response is required from the client.
+
+.Fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `monster`  | `integer`  | *(required)* The KO monster's ID
+
+|===
+
+[[msg-combat-monster-ko-capture]]
+=== `combat:monster-ko:capture`
+
+****
+icon:envelope[] `CLIENT-ONLY`
+
+icon:book[] `States: <<state-authenticated,authenticated>> <<state-combat,combat>>`
+****
+
+.Fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `capture`  | `boolean`  | *(required)* Does the client want to capture the KO monster?
+| `name`     | `string`   | *(optional)* The name of the monster the client want to capture, if it want to rename it.
+                            Can be `nil` if the client don't want to rename it.
+
+|===
+
+.Errors
+* `InvalidResult`: Generated if the client sent the wrong result for the <<msg-combat-monster-ko>> message.
+
+[[msg-combat-monster-ko-replace]]
+=== `combat:monster-ko:replace`
+
+****
+icon:envelope[] `CLIENT-ONLY`
+
+icon:book[] `States: <<state-authenticated,authenticated>> <<state-combat,combat>>`
+****
+
+.Fields
+[cols="15,20,65"]
+|===
+| Field name        | Field type | Description
+
+| `user_monster_id` | `integer`  | *(required)* The UserMonster ID the client want to replace its KO monster with.
+
+|===
+
+.Errors
+* `InvalidResult`: Generated if the client sent the wrong result for the <<msg-combat-monster-ko>> message.
+* `InvalidMonster`: Generated if the client sent an invalid monster.
+
+[[msg-combat-monster-replaced]]
+=== `combat:monster-replaced`
+
+****
+icon:envelope[] `SERVER-ONLY`, `NO RESPONSE NEEDED`
+
+icon:book[] `States: <<state-combat,combat>>`
+****
+
+This message is sent by the server to all combat's participants to notify that the KO monster has been replaced.
+
+.Fields
+[cols="15,20,65"]
+|===
+| Field name | Field type                                 | Description
+
+| `monster`  | `<<struct-combat-monster,combat:Monster>>` | *(required)* The new monster informations
+
+|===
+
+[[msg-combat-flee]]
+=== `combat:flee`
+
+****
+icon:envelope[] `CLIENT-ONLY`
+
+icon:book[] `States: <<state-authenticated,authenticated>> <<state-combat,combat>>`
+****
+
+This message is sent by the client when it want to flee the current combat.
+
+NOTE: TODO: Explain about flee's consequences
+
+.Example
+[source,json]
+----
+{
+    "type": "combat:flee",
+    "token": "Xd3OLGjbBVZC72Hck5w6VC8aUmFMplpc",
+    "combat": 3
+}
+----
+
+[[msg-combat-end]]
+=== `combat:end`
+
+****
+icon:envelope[] `SERVER-ONLY`, `NO RESPONSE NEEDED`
+
+icon:book[] `States: <<state-combat,combat>>`
+****
+
+This message is sent by the server to notify combat's participants the combat has ended.
+
+This message contains informations about the progress of the client's monster.
+
+.Fields
+[cols="15,20,65"]
+|===
+| Field name | Field type                                         | Description
+
+| `status`   | `string`                                           | *(required)* Combat's result for the client: `win` or `lose`
+| `stats`    | `<<msg-combat-end-struct-stats,combat:end:Stats>>` | *(required)* Informations about the client's monster progress.
+
+|===
+
+[[msg-combat-end-struct-Stats]]
+.`combat:end:Stats`
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `id`       | `integer`  | *(required)* The client's monster ID
+| `exp`      | `integer`  | *(required)* Experience points earned
+| `level`    | `integer`  | *(required)* Level(s) earned
+
+|===
+
+.Example
+[source,json]
+----
+{
+    "type": "combat:end",
+    "combat": 3,
+    "status": "win",
+    "stats": {
+        "id": 2,
+        "exp": 1245,
+        "level": 1
+    }
+}
+----

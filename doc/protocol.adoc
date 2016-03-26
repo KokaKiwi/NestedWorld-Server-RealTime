@@ -1,1 +1,23 @@
-= NestedWorld - Realtime server protocol specifications
+= NestedWorld - Realtime server protocol specification
+Aude Lejuez <aude.lejuez@epitech.eu>; Guillaume HERVIER <guillaume.hervier@epitech.eu>
+:toc: left
+:toclevels: 5
+:revnumber: 1.0.0
+:icons: font
+:idprefix:
+:idseparator: -
+:sectnumlevels: 5
+:source-highlighter: coderay
+:table-caption!:
+:numbered:
+
+This document describe the protocol used with the NestedWorld's realtime server.
+
+[abstract]
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and
+"OPTIONAL" in this document are to be interpreted as described in http://tools.ietf.org/html/rfc2119[RFC 2119].
+
+include::protocol/intro.adoc[leveloffset=+1]
+include::protocol/chat.adoc[leveloffset=+1]
+include::protocol/combat.adoc[leveloffset=+1]
+include::protocol/geo.adoc[leveloffset=+1]

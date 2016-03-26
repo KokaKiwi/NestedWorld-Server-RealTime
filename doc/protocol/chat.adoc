@@ -1,0 +1,280 @@
+= Chat
+
+== Structures
+
+[[struct-chat-user]]
+=== `chat:User`
+
+.Fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `id`       | `integer`  | *(required)* The user ID
+| `name`     | `string`   | *(required)* The user name (`pseudo`)
+
+|===
+
+.Example
+[source,json]
+----
+{
+    "id": 5,
+    "name": "KokaKiwi"
+}
+----
+
+== Messages
+
+NOTE: TODO: Describe channel naming rules
+
+[[msg-chat-join-channel]]
+=== `chat:join-channel`
+
+****
+icon:envelope[] `CLIENT-ONLY`
+
+icon:book[] `States: <<state-authenticated,authenticated>>`
+****
+
+This message is sent by the client to ask joining a named channel.
+
+.Request fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `channel`  | `string`   | *(required)* Channel name
+
+|===
+
+.Response fields
+[cols="15,20,65"]
+|===
+| Field name | Field type                              | Description
+
+| `users`    | `array[<<struct-chat-user,chat:User>>]` | *(required)* The list of users currently in the channel
+
+|===
+
+.Errors
+* `InvalidChannel`: Invalid channel (doesn't exists or misnamed)
+
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `reason`   | `string`   | *(required)* `nonexistent \| incorrect-name`
+
+|===
+
+* `Unauthorized`: User not authorized to join this channel
+
+.Example
+[source,json]
+----
+{
+    "type": "chat:join-channel",
+    "token": "yrY9A3lRQd2ekRjNv8EWfYIGGOSmRlJm", # <1>
+    "channel": "general"
+}
+----
+<1> Needed by the `<<state-authenticated,authenticated>>` state
+
+[[msg-chat-part-channel]]
+=== `chat:part-channel`
+
+****
+icon:envelope[] `CLIENT-ONLY`
+
+icon:book[] `States: <<state-authenticated,authenticated>>`
+****
+
+This message is sent by the client to ask parting a named channel where he already is.
+
+NOTE: If a user part a channel he hasn't joined before, no errors are generated.
+
+.Request fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `channel`  | `string`   | *(required)* Channel name
+
+|===
+
+.Errors
+* `InvalidChannel`: Invalid channel (doesn't exists or misnamed)
+
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `reason`   | `string`   | *(required)* `nonexistent \| incorrect-name`
+
+|===
+
+.Example
+[source,json]
+----
+{
+    "type": "chat:part-channel",
+    "token": "CfGIz3roiUXqZr25PLRA79uTuIBz+zp7",
+    "channel": "general"
+}
+----
+
+[[msg-chat-send-message]]
+=== `chat:send-message`
+
+****
+icon:envelope[] `CLIENT-ONLY`
+
+icon:book[] `States: <<state-authenticated,authenticated>>`
+****
+
+This message is sent by the client to send a message in a named channel where he already is.
+
+NOTE: If the user send a message to a channel he hasn't joined, no errors are generated.
+
+.Request fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `channel`  | `string`   | *(required)* Channel name
+| `message`  | `string`   | *(required)* The message content to send
+
+|===
+
+.Errors
+* `InvalidChannel`: Invalid channel (doesn't exists or misnamed)
+
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `reason`   | `string`   | *(required)* `nonexistent \| incorrect-name`
+
+|===
+
+* `MessageTooLong`: Message too long
+
+[cols="15,20,65"]
+|===
+| Field name           | Field type | Description
+
+| `max-message-length` | `integer`  | *(required)* Max message length authorized
+
+|===
+
+.Example
+[source,json]
+----
+{
+    "type": "chat:send-message",
+    "token": "2vjc2Qb6s1bviIcbiJ6fenhlfTt0QqsO",
+    "channel": "general",
+    "message": "Hello world!"
+}
+{
+    "type": "chat:send-message",
+    "token": "2vjc2Qb6s1bviIcbiJ6fenhlfTt0QqsO",
+    "channel": "general",
+    "message": "roll",
+    "me": true
+}
+----
+
+[[msg-chat-user-joined]]
+=== `chat:user-joined`
+
+****
+icon:envelope[] `SERVER-ONLY`, `NO RESPONSE NEEDED`
+****
+
+This message is sent by the server to notify the client an user has joined a channel the client has joined.
+
+.Fields
+[cols="15,20,65"]
+|===
+| Field name | Field type                       | Description
+
+| `channel`  | `string`                         | *(required)* Channel name
+| `user`     | `<<struct-chat-user,chat:User>>` | *(required)* The user who joined the channel
+
+|===
+
+.Example
+[source,json]
+----
+{
+    "type": "chat:user-joined",
+    "channel": "general",
+    "user": {
+        "id": 5,
+        "name": "KokaKiwi"
+    }
+}
+----
+
+[[msg-chat-user-parted]]
+=== `chat:user-parted`
+
+****
+icon:envelope[] `SERVER-ONLY`, `NO RESPONSE NEEDED`
+****
+
+This message is sent by the server to notify the client an user has parted from a channel the client has joined.
+
+.Fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `channel`  | `string`   | *(required)* Channel name
+| `user`     | `integer`  | *(required)* The user ID of the user who parted from the channel
+
+|===
+
+.Example
+[source,json]
+----
+{
+    "type": "chat:user-parted",
+    "channel": "general",
+    "user": 5
+}
+----
+
+[[msg-chat-message-received]]
+=== `chat:message-received`
+
+****
+icon:envelope[] `SERVER-ONLY`, `NO RESPONSE NEEDED`
+****
+
+This message is sent by the server to notify the client a chat message has been sent to a channel the client
+has joined.
+
+.Fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `channel`  | `string`   | *(required)* Channel name
+| `user`     | `integer`  | *(required)* The user ID of the user who sent the message
+| `message`  | `string`   | *(required)* The message content
+
+|===
+
+.Example
+[source,json]
+----
+{
+    "type": "chat:message-received",
+    "channel": "general",
+    "user": 5,
+    "message": "Hello world!"
+}
+----
