@@ -6,6 +6,10 @@ doc/*.sh
 doc/*.html
 README.html
 
+# Python stuff
+*.pyc
+__pycache__
+
 # Misc stuff
 .*
 !.dummy
