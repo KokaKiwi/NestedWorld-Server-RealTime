@@ -5,11 +5,11 @@ authors = ["KokaKiwi <kokakiwi@kokakiwi.net>"]
 
 [dependencies]
 log = "0.3.5"
-log4rs = "0.3.3"
+log4rs = "0.4.2"
 nestedworld-server = { path = "../server" }
 quick-error = "1.0.0"
 rustc-serialize = "0.3.18"
-toml-config = "0.2.0"
+toml-config = "0.3.0"
 
 [dependencies.clap]
 version = "2.1.2"

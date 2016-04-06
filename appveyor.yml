@@ -1,17 +1,11 @@
 environment:
   DATABASE_URL: postgres://postgres:Password12!@localhost:5432/nestedworld_tests
-  OPENSSL_INCLUDE_DIR: C:\OpenSSL\include
-  OPENSSL_LIB_DIR: C:\OpenSSL\lib
-  OPENSSL_LIBS: ssleay32:libeay32
   PGPASSWORD: Password12!
-  RUST_VERSION: 2016-02-25
+  RUST_VERSION: 2016-04-05
   matrix:
   - TARGET: x86_64-pc-windows-msvc
-    BITS: 64
   - TARGET: i686-pc-windows-msvc
-    BITS: 32
   - TARGET: i686-pc-windows-gnu
-    BITS: 32
 services:
   - postgresql93
 
@@ -24,8 +18,6 @@ notifications:
 build: false
 
 install:
-  - ps: Start-FileDownload "http://slproweb.com/download/Win${env:BITS}OpenSSL-1_0_2g.exe"
-  - Win%BITS%OpenSSL-1_0_2g.exe /SILENT /VERYSILENT /SP- /DIR="C:\OpenSSL"
   - ps: Start-FileDownload "https://static.rust-lang.org/dist/${env:RUST_VERSION}/rust-nightly-${env:TARGET}.exe"
   - rust-nightly-%TARGET%.exe /VERYSILENT /NORESTART /DIR="C:\Program Files (x86)\Rust"
   - SET PATH=%PATH%;C:\Program Files (x86)\Rust\bin

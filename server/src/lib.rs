@@ -1,5 +1,4 @@
 #[macro_use] extern crate chan;
-#[macro_use] extern crate hyper;
 #[macro_use] extern crate log;
 extern crate mio;
 pub extern crate nestedworld_db;
