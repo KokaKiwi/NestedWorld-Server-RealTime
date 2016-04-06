@@ -1,15 +1,19 @@
 #[macro_use] extern crate chan;
+#[macro_use] extern crate hyper;
 #[macro_use] extern crate log;
 extern crate mio;
-extern crate nestedworld_db;
+pub extern crate nestedworld_db;
 #[macro_use] extern crate quick_error;
 
 use mio::*;
 pub use nestedworld_db as db;
 pub use server::config::Config;
+use server::msg::Message;
 use std::io;
 use std::thread;
 
+#[macro_use] pub mod utils;
+pub mod net;
 mod server;
 
 pub struct ServerLoop {
@@ -39,11 +43,13 @@ impl ServerLoop {
         use server::Server;
 
         let mut server = Server::new(self.config).unwrap();
+        server.register(&mut self.event_loop);
 
-        self.event_loop.run(&mut server).unwrap()
+        self.event_loop.run(&mut server).unwrap();
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct ServerSender(Sender<server::msg::Message>);
 
 impl ServerSender {
@@ -56,7 +62,6 @@ impl ServerSender {
     }
 
     pub fn stop(&self) -> io::Result<bool> {
-        use server::msg::Message;
         self.send(Message::Stop)
     }
 }
