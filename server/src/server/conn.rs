@@ -1,4 +1,4 @@
-use mio::*;
+use mio::{Token, EventLoop, EventSet, PollOpt};
 use mio::tcp::TcpStream;
 use std::net::SocketAddr;
 use super::Server;
