@@ -2,7 +2,7 @@
 Guillaume HERVIER <guillaume.hervier@epitech.eu>; Aude LEJUEZ <aude.lejuez@epitech.eu>
 :toc: left
 :version: 0.1.0
-:rustversion: nightly
+:rustversion: nightly-2016-04-28
 
 Protocol documentation: http://eip.kokakiwi.net/doc/protocol.html
 
