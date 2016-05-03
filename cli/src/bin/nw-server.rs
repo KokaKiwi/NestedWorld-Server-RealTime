@@ -4,7 +4,6 @@ extern crate nestedworld_cli as cli;
 extern crate nestedworld_server as server;
 
 use cli::config::Config;
-use server::{Config as ServerConfig, ServerLoop};
 
 fn main() {
     // Configure log
@@ -21,12 +20,10 @@ fn main() {
     let config = Config::load(config_file);
 
     // Run server
-    let server_config = ServerConfig {
-        listen: config.server.listen(),
+    let server_config = server::Config {
+        listen_addr: config.server.listen(),
     };
-    let server_loop = ServerLoop::new(server_config).unwrap();
-    let handle = server_loop.start();
-
+    let handle = server::run(server_config);
     println!("Server started at {}. Press Ctrl+C to stop.", config.server.listen());
     handle.join().unwrap();
 }

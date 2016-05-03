@@ -2,20 +2,19 @@
 Guillaume HERVIER <guillaume.hervier@epitech.eu>; Aude LEJUEZ <aude.lejuez@epitech.eu>
 :toc: left
 :version: 0.1.0
-:rustversion: nightly
+:rustversion: nightly-2016-04-28
 
 Protocol documentation: http://eip.kokakiwi.net/doc/protocol.html
 
 == Build environment
 
-You need `multirust` to manage your Rust environment, which is available here: https://github.com/brson/multirust
+As the nightly version of Rust is required to build this program, you may use the utility `rustup` in order to manage
+your Rust installation.
 
-TIP: There is an `AUR` package for Arch Linux: https://aur.archlinux.org/packages/multirust
+TIP: You can install `rustup` from the official website: https://www.rustup.rs
 
-When you installed `multirust`, you need a specific Rust version for this project, which you can use by "overriding"
-the Rust version for this project directory by using `multirust override <rust version>`
-
-Actually, the needed Rust version is `{rustversion}`, which you can use by typing: `multirust override {rustversion}`
+You can then specify the required Rust version needed for this project by "overriding" the Rust version for the
+project root directory by running the command `rustup override {rustversion}`
 
 == Project rules
 

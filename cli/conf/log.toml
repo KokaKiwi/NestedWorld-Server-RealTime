@@ -2,18 +2,18 @@
 refresh_rate = 30
 
 # An appender named "stdout" that writes to stdout
-[appender.stdout]
+[appenders.stdout]
 kind = "console"
 pattern = "[%l] %M (%f:%L) - %m"
 
 # Database logs
-[appender.db]
+[appenders.db]
 kind = "file"
 path = "logs/db.log"
 pattern = "%d - %l - %M (%f:%L) - %m"
 
 # Server logs
-[appender.server]
+[appenders.server]
 kind = "file"
 path = "logs/server.log"
 

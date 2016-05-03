@@ -1,28 +1,34 @@
-import npyscreen as nps
+import readline
+import sys
 
 
-class ChatApp(nps.NPSAppManaged):
-
-    def onStart(self):
-        self.registerForm('MAIN', IntroForm())
-        self.registerForm('CHAT', ChatForm())
-
-
-class IntroForm(nps.Popup):
+class ChatApp:
 
     def __init__(self):
-        super().__init__(name='Intro')
+        self.prompt = '> '
+        self.on_message = None
+        self.has_prompt = False
 
-    def create(self):
-        self.name_field = self.add(nps.TitleText, name='Name:')
+    def run(self):
+        while True:
+            self.has_prompt = True
+            line = input(self.prompt)
+            self.has_prompt = False
 
-    def afterEditing(self):
-        self.parentApp.setNextForm('CHAT')
+            if self.on_message is not None:
+                self.on_message(line)
 
+    def push(self, line):
+        buf = readline.get_line_buffer()
 
-class ChatForm(nps.FormMutt):
+        # Clean line
+        spaces = ' ' * (len(buf) + 2)
+        sys.stdout.write('\r' + spaces + '\r')
 
-    def create(self):
-        super().create()
+        # Print line
+        print(line, file=sys.stdout)
 
-        self.add_handlers({'^D': lambda *args: self.parentApp.switchForm(None)})
+        # Rewrite input
+        if self.has_prompt:
+            sys.stdout.write(self.prompt + buf)
+        sys.stdout.flush()
