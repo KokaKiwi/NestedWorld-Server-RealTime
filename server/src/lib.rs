@@ -1,68 +1,25 @@
 #[macro_use] extern crate chan;
 #[macro_use] extern crate log;
-extern crate mio;
+extern crate mioco;
 pub extern crate nestedworld_db;
 #[macro_use] extern crate quick_error;
+extern crate rmp;
 
-use mio::*;
-pub use nestedworld_db as db;
-pub use server::config::Config;
-use server::msg::Message;
-use std::io;
-use std::thread;
+use mioco::JoinHandle;
+use std::net::SocketAddr;
 
-#[macro_use] pub mod utils;
-pub mod net;
-mod server;
-
-pub struct ServerLoop {
-    config: Config,
-    event_loop: EventLoop<server::Server>,
-}
-
-impl ServerLoop {
-    pub fn new(config: Config) -> io::Result<ServerLoop> {
-        let event_loop = try!(EventLoop::new());
-
-        Ok(ServerLoop {
-            config: config,
-            event_loop: event_loop,
-        })
-    }
-
-    pub fn channel(&self) -> ServerSender {
-        ServerSender(self.event_loop.channel())
-    }
-
-    pub fn start(self) -> ServerHandle {
-        thread::spawn(move || self.run())
-    }
-
-    fn run(mut self) {
-        use server::Server;
-
-        let mut server = Server::new(self.config).unwrap();
-        server.register(&mut self.event_loop);
-
-        self.event_loop.run(&mut server).unwrap();
-    }
-}
+mod net;
 
 #[derive(Debug, Clone)]
-pub struct ServerSender(Sender<server::msg::Message>);
-
-impl ServerSender {
-    fn send(&self, msg: server::msg::Message) -> io::Result<bool> {
-        match self.0.send(msg) {
-            Ok(_) => Ok(true),
-            Err(NotifyError::Io(err)) => Err(err),
-            Err(_) => Ok(false),
-        }
-    }
-
-    pub fn stop(&self) -> io::Result<bool> {
-        self.send(Message::Stop)
-    }
+pub struct Config {
+    pub listen_addr: SocketAddr,
 }
 
-pub type ServerHandle = thread::JoinHandle<()>;
+pub fn run(config: Config) -> JoinHandle<()> {
+    mioco::spawn(move || {
+        let net_handle = mioco::spawn(move || net::run(config.clone()));
+
+        // Join all handles in order to keep them running.
+        net_handle.join().unwrap();
+    })
+}
