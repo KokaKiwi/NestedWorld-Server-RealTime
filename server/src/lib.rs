@@ -11,7 +11,7 @@ extern crate rmp;
 use mioco::JoinHandle;
 use std::net::SocketAddr;
 
-mod net;
+#[macro_use] pub mod net;
 
 #[derive(Debug, Clone)]
 pub struct Config {

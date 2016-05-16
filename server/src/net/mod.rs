@@ -2,9 +2,10 @@ use mioco;
 use mioco::tcp::TcpListener;
 use super::Config;
 
+#[macro_use] pub mod msg;
 mod conn;
 
-pub fn run(config: Config) {
+pub(crate) fn run(config: Config) {
     let listener = TcpListener::bind(&config.listen_addr).unwrap();
 
     loop {
