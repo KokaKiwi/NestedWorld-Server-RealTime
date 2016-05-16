@@ -1,3 +1,6 @@
+#![feature(custom_derive, plugin, pub_restricted, specialization)]
+#![plugin(serde_macros)]
+
 #[macro_use] extern crate chan;
 #[macro_use] extern crate log;
 extern crate mioco;

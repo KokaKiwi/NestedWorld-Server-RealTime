@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["KokaKiwi <kokakiwi@kokakiwi.net>"]
 
 [dependencies]
+clippy = { version = "*", optional = true }
 log = "0.3.5"
 nestedworld-server = { path = "../server" }
 quick-error = "1.0.0"
@@ -11,7 +12,7 @@ rustc-serialize = "0.3.18"
 toml-config = "0.3.0"
 
 [dependencies.clap]
-version = "2.1.2"
+version = "^2.4"
 features = ["nightly", "unstable"]
 
 [dependencies.log4rs]

@@ -2,7 +2,7 @@ language: rust
 addons:
     postgresql: 9.3
 rust:
-    - nightly-2016-04-28
+    - nightly-2016-05-11
 services:
     - postgresql
 env:
