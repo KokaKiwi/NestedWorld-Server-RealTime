@@ -1,7 +1,8 @@
 // Helper macros for creating MessagePack values
-
-#[macro_export]
 macro_rules! rmp_array {
+    [] => {
+        $crate::rmp::Value::Array(Vec::new())
+    };
     [$($item:expr),*] => {
         {
             use $crate::net::msg::utils::rmp::IntoValue;
@@ -13,8 +14,10 @@ macro_rules! rmp_array {
     };
 }
 
-#[macro_export]
 macro_rules! rmp_map {
+    [] => {
+        $crate::rmp::Value::Map(Vec::new())
+    };
     [$($key:expr => $value:expr),*] => {
         {
             use $crate::net::msg::utils::rmp::IntoValue;

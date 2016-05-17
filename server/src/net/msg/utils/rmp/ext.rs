@@ -6,6 +6,7 @@ pub trait ValueExt {
     fn from<T: IntoValue>(value: T) -> Self;
 
     // Map methods
+    // - getters
     fn get<K: IntoValue>(&self, key: K) -> Option<&Value>;
 
     /// Lookup a value from a path, a dot-delimited string which indicate the keys to get
@@ -31,6 +32,9 @@ pub trait ValueExt {
         self.get(key).and_then(ValueExt::as_array)
     }
 
+    // - setters
+    fn set<K: IntoValue, V: IntoValue>(&mut self, key: K, value: V);
+
     // Convert methods
     fn as_bool(&self) -> Option<bool>;
     fn as_int(&self) -> Option<Integer>;
@@ -51,12 +55,12 @@ impl ValueExt for Value {
 
     // Map methods
     fn get<K: IntoValue>(&self, key: K) -> Option<&Value> {
-        let key = key.into_value();
         let map = match *self {
             Value::Map(ref entries) => entries,
             _ => return None,
         };
 
+        let key = key.into_value();
         map.iter().find(|entry| entry.0 == key).map(|entry| &entry.1)
     }
 
@@ -69,6 +73,26 @@ impl ValueExt for Value {
             };
         }
         Some(cur)
+    }
+
+    fn set<K: IntoValue, V: IntoValue>(&mut self, key: K, value: V) {
+        let mut map = match *self {
+            Value::Map(ref mut entries) => entries,
+            _ => return,
+        };
+
+        let key = key.into_value();
+        let value = value.into_value();
+
+        // FIXME: Workaround until non-lexical borrows are here.
+        if let Some(index) = map.iter_mut().enumerate()
+                                .find(|&(_, ref entry)| entry.0 == key)
+                                .map(|(index, _)| index)
+        {
+            map[index].1 = value;
+        } else {
+            map.push((key, value));
+        }
     }
 
     // Convert methods
