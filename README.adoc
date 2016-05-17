@@ -6,6 +6,8 @@ Guillaume HERVIER <guillaume.hervier@epitech.eu>; Aude LEJUEZ <aude.lejuez@epite
 
 Protocol documentation: http://eip.kokakiwi.net/doc/protocol.html
 
+Library API documentation: http://nestedworld.github.io/NestedWorld-Server-RealTime/nestedworld_server/index.html
+
 == Build environment
 
 As the nightly version of Rust is required to build this program, you may use the utility `rustup` in order to manage
