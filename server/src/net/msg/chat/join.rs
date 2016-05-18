@@ -1,10 +1,11 @@
 use net::msg::{MessagePart, MessageHeader};
 use net::msg::error::Result;
 use net::msg::states::auth::Authenticated;
-use net::msg::utils::fields::FieldType;
+use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
 
+#[derive(Debug, Clone, PartialEq)]
 pub struct JoinChannel {
     pub header: MessageHeader,
     pub auth: Authenticated,
@@ -16,7 +17,7 @@ impl MessagePart for JoinChannel {
         Ok(JoinChannel {
             header: try!(MessageHeader::decode(data)),
             auth: try!(Authenticated::decode(data)),
-            channel: try!(FieldType::get(data, "channel")),
+            channel: try!(fields::get(data, "channel")),
         })
     }
 
@@ -24,6 +25,6 @@ impl MessagePart for JoinChannel {
         data.set("type", "chat:join-channel");
         self.header.encode(data);
         self.auth.encode(data);
-        self.channel.set(data, "channel");
+        data.set("channel", &self.channel);
     }
 }

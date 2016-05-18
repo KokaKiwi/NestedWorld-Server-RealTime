@@ -1,8 +1,10 @@
 use rmp::Value;
 use net::msg::MessagePart;
 use net::msg::error::Result;
-use net::msg::utils::fields::FieldType;
+use net::msg::utils::fields;
+use net::msg::utils::rmp::ValueExt;
 
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Authenticated {
     pub token: String,
 }
@@ -10,11 +12,11 @@ pub struct Authenticated {
 impl MessagePart for Authenticated {
     fn decode(data: &Value) -> Result<Self> {
         Ok(Authenticated {
-            token: try!(FieldType::get(data, "token")),
+            token: try!(fields::get(data, "token")),
         })
     }
 
     fn encode(&self, data: &mut Value) {
-        self.token.set(data, "token");
+        data.set("token", &self.token);
     }
 }

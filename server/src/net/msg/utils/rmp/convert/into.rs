@@ -16,23 +16,23 @@ impl IntoValue for bool {
 }
 
 macro_rules! int_convert {
-    ($ctor:ident, $int_ty:ty as $value_ty:ty) => {
-        impl IntoValue for $int_ty {
+    ($ctor:ident, $ty:ty) => {
+        impl IntoValue for $ty {
             fn into_value(self) -> Value {
-                Value::Integer(Integer::$ctor(self as $value_ty))
+                Value::Integer(Integer::$ctor(self as _))
             }
         }
     };
 }
 
-int_convert!(I64, i8  as i64);
-int_convert!(I64, i16 as i64);
-int_convert!(I64, i32 as i64);
-int_convert!(I64, i64 as i64);
-int_convert!(U64, u8  as u64);
-int_convert!(U64, u16 as u64);
-int_convert!(U64, u32 as u64);
-int_convert!(U64, u64 as u64);
+int_convert!(I64, i8);
+int_convert!(I64, i16);
+int_convert!(I64, i32);
+int_convert!(I64, i64);
+int_convert!(U64, u8);
+int_convert!(U64, u16);
+int_convert!(U64, u32);
+int_convert!(U64, u64);
 
 impl IntoValue for f32 {
     fn into_value(self) -> Value {
