@@ -1,7 +1,6 @@
 use rmp::Value;
-use net::msg::MessagePart;
 use net::msg::error::{Result, Error};
-use net::msg::utils::rmp::{FromValue, ToValue};
+use net::msg::utils::rmp::FromValue;
 use super::rmp::ValueExt;
 
 pub fn get<'a, T: FromValue<'a>>(data: &'a Value, key: &'static str) -> Result<T> {

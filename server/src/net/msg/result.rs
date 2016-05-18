@@ -32,27 +32,50 @@ impl MessagePart for ResultMessage {
         data.remove("type");
         data.remove("result");
 
-        match result {
+        let data = match result {
             "success" => {
-                unimplemented!()
+                ResultData::Success(data)
             }
             "error" => {
-                unimplemented!()
+                let kind = try!(fields::get(&data, "kind"));
+                let message = try!(fields::get(&data, "message"));
+
+                data.remove("kind");
+                data.remove("message");
+
+                ResultData::Error {
+                    kind: kind,
+                    message: message,
+                    data: data,
+                }
             }
-            _ => Err(Error::InvalidField("result", format!("Bad result type `{}`, should be `success` or `error`", result))),
-        }
+            _ => return Err(Error::InvalidField("result", format!("Bad result type `{}`, should be `success` or `error`", result))),
+        };
+
+        Ok(ResultMessage {
+            header: header,
+            data: data,
+        })
     }
 
     fn encode(&self, data: &mut Value) {
         data.set("type", "result");
         self.header.encode(data);
         match self.data {
-            ResultData::Success(ref data) => {}
+            ResultData::Success(ref r_data) => {
+                data.set("result", "success");
+                data.extend(r_data);
+            }
             ResultData::Error {
-                kind: ref kind,
-                message: ref message,
-                data: ref data,
-            } => {}
+                ref kind,
+                ref message,
+                data: ref r_data,
+            } => {
+                data.set("result", "error");
+                data.set("kind", kind);
+                data.set("message", message);
+                data.extend(r_data);
+            }
         }
     }
 }
