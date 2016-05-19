@@ -33,3 +33,8 @@ impl MessagePart for MessageHeader {
         data.set("id", &self.id);
     }
 }
+
+message!(Message:
+    ref Chat(self::chat::Message),
+    type "result" => Result(self::result::ResultMessage),
+);
