@@ -24,6 +24,7 @@ config_struct! {
 config_struct! {
     pub struct ServerConfig {
         pub listen: String = "127.0.0.1:6464".to_owned(),
+        pub secret: String = "CHANGEME".to_owned(),
     }
 }
 

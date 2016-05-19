@@ -1,12 +1,13 @@
-#![feature(custom_derive, plugin, pub_restricted, specialization)]
-#![plugin(serde_macros)]
+#![feature(pub_restricted, specialization)]
 
 #[macro_use] extern crate chan;
+extern crate jsonwebtoken as jwt;
 #[macro_use] extern crate log;
 extern crate mioco;
 pub extern crate nestedworld_db;
 #[macro_use] extern crate quick_error;
 extern crate rmp;
+extern crate rustc_serialize;
 
 use mioco::JoinHandle;
 use std::net::SocketAddr;
@@ -15,7 +16,10 @@ use std::net::SocketAddr;
 
 #[derive(Debug, Clone)]
 pub struct Config {
+    /// Server listen address.
     pub listen_addr: SocketAddr,
+    /// Secret key used for session handling.
+    pub secret: String,
 }
 
 pub fn run(config: Config) -> JoinHandle<()> {

@@ -1,5 +1,6 @@
 [server]
 listen = "0.0.0.0:6464"
+secret = "f=G4(lG~dqW}Y^P=~]5qP_,XO<Hh\\^Ez"
 
 [database]
 url = "postgres://kokakiwi@localhost/nestedworld"

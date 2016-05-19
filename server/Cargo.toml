@@ -6,10 +6,10 @@ authors = ["KokaKiwi <kokakiwi@kokakiwi.net>"]
 [dependencies]
 chan = "0.1.14"
 clippy = { version = "*", optional = true }
+jsonwebtoken = "^1.1"
 log = "0.3.5"
 mioco = "0.5.0"
 nestedworld-db = { path = "../db" }
-rmp = "^0.7"
-serde = "^0.7"
-serde_macros = "^0.7"
 quick-error = "1.0.0"
+rmp = "^0.7"
+rustc-serialize = "^0.3"
