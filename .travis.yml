@@ -27,5 +27,4 @@ before_script:
 - psql -c 'create extension postgis;' -U postgres -d nestedworld_tests
 script: make test
 after_success:
-- cd server && travis-cargo coveralls --no-sudo --verify
-- cd cli && travis-cargo doc-upload --branch=develop
+- make travis
