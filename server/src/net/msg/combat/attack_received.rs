@@ -21,8 +21,8 @@ impl MessagePart for AttackReceived {
             header: try!(MessageHeader::decode(data)),
             auth: try!(Authenticated::decode(data)),
             attack: try!(fields::get(data, "attack")),
-            monster: try!(Monster::decode(data)),
-            target: try!(Monster::decode(data)),
+            monster: try!(fields::get(data, "monster")),
+            target: try!(fields::get(data, "target")),
         })
 
     }
@@ -32,7 +32,7 @@ impl MessagePart for AttackReceived {
         self.header.encode(data);
         self.auth.encode(data);
         data.set("attack", &self.attack);
-        self.monster.encode(data);
-        self.target.encode(data);
+        data.set("monster", self.monster.value());
+        data.set("target", self.target.value());
     }
 }
