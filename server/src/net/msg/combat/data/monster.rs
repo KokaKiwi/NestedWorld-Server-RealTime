@@ -27,7 +27,6 @@ impl MessagePart for Monster {
     }
 
     fn encode(&self , data: &mut Value) {
-        data.set("type", "combat:Monster");
         data.set("id", &self.id);
         data.set("name", &self.name);
         data.set("monster_id", &self.monster_id);

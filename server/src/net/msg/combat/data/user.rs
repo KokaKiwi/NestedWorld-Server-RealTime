@@ -20,7 +20,6 @@ impl MessagePart for User {
     }
 
     fn encode(&self, data: &mut Value) {
-        data.set("type", "combat:User");
         data.set("id", &self.name);
         data.set("user", &self.id);
     }

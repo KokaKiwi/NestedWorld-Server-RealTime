@@ -17,7 +17,6 @@ impl MessagePart for User {
     }
 
     fn encode(&self, data: &mut Value) {
-        data.set("type", "combat:start:User");
         self.monster.encode(data);
     }
 }

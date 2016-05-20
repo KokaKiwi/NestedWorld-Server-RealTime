@@ -23,7 +23,6 @@ impl MessagePart for Opponent {
     }
 
     fn encode(&self, data: &mut Value) {
-        data.set("type", "combat:start:Opponent");
         self.monster.encode(data);
         self.user.encode(data);
         data.set("monsters_count", &self.monsters_count);
