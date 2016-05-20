@@ -14,6 +14,12 @@ pub mod states;
 pub trait MessagePart: Sized {
     fn decode(data: &Value) -> Result<Self>;
     fn encode(&self, data: &mut Value);
+
+    fn value(&self) -> Value {
+        let mut data = rmp_map![];
+        self.encode(&mut data);
+        data
+    }
 }
 
 impl<'a, M: MessagePart> FromValue<'a> for M {
