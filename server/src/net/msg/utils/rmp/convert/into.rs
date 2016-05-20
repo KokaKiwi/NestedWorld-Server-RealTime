@@ -121,7 +121,7 @@ impl ToValue for [u8] {
 }
 
 impl<T: Clone + IntoValue> ToValue for T {
-    default fn to_value(&self) -> Value {
+    fn to_value(&self) -> Value {
         self.clone().into_value()
     }
 }
