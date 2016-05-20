@@ -1,7 +1,7 @@
 use rmp::Value;
 use self::error::Result;
 use self::utils::fields;
-use self::utils::rmp::ValueExt;
+use self::utils::rmp::{FromValue, ValueExt};
 
 #[macro_use] pub mod utils;
 #[macro_use] mod macros;
@@ -14,6 +14,12 @@ pub mod states;
 pub trait MessagePart: Sized {
     fn decode(data: &Value) -> Result<Self>;
     fn encode(&self, data: &mut Value);
+}
+
+impl<'a, M: MessagePart> FromValue<'a> for M {
+    fn from_value(value: &'a Value) -> Option<M> {
+        M::decode(value).ok()
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
