@@ -1,6 +1,5 @@
 use net::msg::{MessagePart, MessageHeader};
 use net::msg::error::{Result, Error};
-use net::msg::states::auth::Authenticated;
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
@@ -9,7 +8,6 @@ use super::data::user::User;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Available {
     pub header: MessageHeader,
-    pub auth: Authenticated,
     pub data: OriginData,
 }
 
@@ -27,7 +25,6 @@ pub enum OriginData {
 impl MessagePart for Available {
     fn decode(data: &Value) -> Result<Available> {
         let header = try!(MessageHeader::decode(data));
-        let auth = try!(Authenticated::decode(data));
 
         let origin: &str = try!(fields::get(data, "origin"));
         let data = match origin {
@@ -50,7 +47,6 @@ impl MessagePart for Available {
 
         Ok(Available {
             header: header,
-            auth: auth,
             data: data,
         })
     }
@@ -58,7 +54,6 @@ impl MessagePart for Available {
     fn encode(&self, data: &mut Value) {
         data.set("type", "combat:available");
         self.header.encode(data);
-        self.auth.encode(data);
         match self.data {
             OriginData::WildMonster {
                 ref monster_id,

@@ -1,6 +1,5 @@
 use net::msg::{MessagePart, MessageHeader};
 use net::msg::error::{Result};
-use net::msg::states::auth::Authenticated;
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
@@ -10,7 +9,6 @@ use super::data::start::opponent::Opponent;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Start {
     pub header: MessageHeader,
-    pub auth: Authenticated,
     pub id: u32,
     pub user: User,
     pub opponent: Opponent,
@@ -23,7 +21,6 @@ impl MessagePart for Start {
     fn decode(data: &Value) -> Result<Start> {
         Ok(Start {
             header: try!(MessageHeader::decode(data)),
-            auth: try!(Authenticated::decode(data)),
             id: try!(fields::get(data, "id")),
             user: try!(fields::get(data, "user")),
             opponent: try!(fields::get(data, "opponent")),
@@ -37,7 +34,6 @@ impl MessagePart for Start {
     fn encode(&self, data: &mut Value) {
         data.set("type", "combat:start");
         self.header.encode(data);
-        self.auth.encode(data);
         data.set("id", &self.id);
         data.set("user", self.user.value());
         data.set("opponent", self.opponent.value());
