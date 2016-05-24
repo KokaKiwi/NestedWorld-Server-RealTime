@@ -1,6 +1,5 @@
 use net::msg::{MessagePart};
 use net::msg::error::Result;
-use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
 use super::super::monster::Monster;
 

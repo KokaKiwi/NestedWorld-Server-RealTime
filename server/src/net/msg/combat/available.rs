@@ -39,7 +39,7 @@ impl MessagePart for Available {
                 }
             }
             "duel" => {
-                let user = try!(User::decode(try!(fields::get(data, "user"))));
+                let user = try!(fields::get(data, "user"));
 
                 OriginData::Duel {
                     user: user,
@@ -70,7 +70,7 @@ impl MessagePart for Available {
                 ref user,
             } => {
                 data.set("origin", "duel");
-                user.encode(data);
+                data.set("user", user.value());
             }
         }
     }
