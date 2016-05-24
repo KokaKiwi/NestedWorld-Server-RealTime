@@ -1,20 +1,30 @@
 language: rust
+sudo: false
 addons:
-    postgresql: 9.3
+  apt:
+    packages:
+    - libcurl4-openssl-dev
+    - libelf-dev
+    - libdw-dev
+    - binutils-dev
+  postgresql: 9.3
 rust:
-    - nightly-2016-05-16
+- nightly-2016-05-16
 services:
-    - postgresql
+- postgresql
 env:
-    global:
-        DATABASE_URL: postgres://postgres@localhost/nestedworld_tests
-
+  global:
+  - DATABASE_URL: postgres://postgres@localhost/nestedworld_tests
+  - secure: OM63PwsBeJFTUluPmLUU0JbUmvUGV3l22Qqsn6pZu5gBBZNqj+WS48QZZCdpha3wQJ9cYcPTXhfPuwIcCeSdX+XfZiJyDh6Q2qJr5j6Yh0gkBxuM67pBTIt80/Q68AT9YtFb6qlF0GzIcPwGBS7liAg11dVTLSYkmqCuYN0/4sskGJejOYPgfju5NucuEzu2JSiuug24kSA/1JvEr95quuRSXpbO9pTSanboJ2T6zvrL0JkvKCxblm0j2obPKCP3clwVRk1lebLtB0WlTLNvUaXZaYExQGOx/OAuxeuipI6QrGEqyOxHSOFwayrks2sqCUMXVGQN9ittDEfi7kctSIo01fk8dhxewNtz86nmBBDAG6JLpj8Z7S3ki9CFzG6UA8oyD/hK+SxgsUXPWRIVaDt9lGn4xeu9RsigHo1Cce7bcLKefgcoJNzWciSJf46Jgb+P9b//YvJrAqKdj998Ek8LP5kMjnSOJXdhTm/MskZ49aAUUyeXKXAInL9GHF92Gw7rTSeelvhbKTn65SWa2hhDFXc1zQPAAiEsECsFPQn1LI4rirlWHE7Dq4b8VknfiYJsVh6QfG4Fg3OHE1IRuyAmtNMOZpnZXF6g1UGwmicypRcloVrfvW/oX2aVrM+uEbstAxLrvEa+jWm2UAnFnxJ0QaWskkXk7OHKaS3OVZQ=
 notifications:
-    slack:
-        secure: G1pGeor8Q87/v83eJ0K4JI9El3pH9BEIOucPwQqdGG91nGSOQKLqD/gk/N+3t8xCJbbTnp4Qwog6fgC33VS35dJsg/6IYXgC4UkmomIFD4oI2zHhlQbvUZuCJQcgQ0JYobfWgEhl5rVRLBgVHwJkwLqDaA90IkwNrqi4vaZHN5LGunZ/tp7vm4LBCJTAjxY6A7Ouw2IyqdwywdMas1OpVTWxM8nXpuWjgSAt6ZOvlcQVGGT3ajLqOWkKyJDbaj6qm3AtPNvyFcU5ZhRn+SjOXedLa+78fLUcJJLvAYLQsehMG9h8zCtwyq0E6WfO/exSPzLPx4ZwGrpcA5lQKK9qz5LOMEsyXMTiRq+ACIpD84t9/Wx5cK+Op9MgoEygKaiFYN2arGi7EgJvqUDbYxQHFJdV+nrGLJ0YWKjW5qCvTHQI5sg3AJToI+yzoVvOl6LOviVro5/BcqNJ1spVmFe/9KrU1vl9zmwN9MaKWGXcDtbXARObqHuCM4B85uPwjLczIvq5K1vtd/unudiSYOUX8C/B4giF7eC7J/3C+BLVTByHL54wJbTxCsTsMKwvm8uVxjvp9p1Vi0eW+Y7pMJC0EbWO0m9T759f8kvLY8vOLSQIkYEe0vZR5EwVMVLxzW9Tk38bfUvxi86DJPlBPRYx5b8h9UQYTvbqxe/lmVMe7zE=
-
+  slack:
+    secure: G1pGeor8Q87/v83eJ0K4JI9El3pH9BEIOucPwQqdGG91nGSOQKLqD/gk/N+3t8xCJbbTnp4Qwog6fgC33VS35dJsg/6IYXgC4UkmomIFD4oI2zHhlQbvUZuCJQcgQ0JYobfWgEhl5rVRLBgVHwJkwLqDaA90IkwNrqi4vaZHN5LGunZ/tp7vm4LBCJTAjxY6A7Ouw2IyqdwywdMas1OpVTWxM8nXpuWjgSAt6ZOvlcQVGGT3ajLqOWkKyJDbaj6qm3AtPNvyFcU5ZhRn+SjOXedLa+78fLUcJJLvAYLQsehMG9h8zCtwyq0E6WfO/exSPzLPx4ZwGrpcA5lQKK9qz5LOMEsyXMTiRq+ACIpD84t9/Wx5cK+Op9MgoEygKaiFYN2arGi7EgJvqUDbYxQHFJdV+nrGLJ0YWKjW5qCvTHQI5sg3AJToI+yzoVvOl6LOviVro5/BcqNJ1spVmFe/9KrU1vl9zmwN9MaKWGXcDtbXARObqHuCM4B85uPwjLczIvq5K1vtd/unudiSYOUX8C/B4giF7eC7J/3C+BLVTByHL54wJbTxCsTsMKwvm8uVxjvp9p1Vi0eW+Y7pMJC0EbWO0m9T759f8kvLY8vOLSQIkYEe0vZR5EwVMVLxzW9Tk38bfUvxi86DJPlBPRYx5b8h9UQYTvbqxe/lmVMe7zE=
 before_script:
-  - psql -c 'create database nestedworld_tests;' -U postgres
-  - psql -c 'create extension postgis;' -U postgres -d nestedworld_tests
-
+- |
+  pip install 'travis-cargo<0.2' --user &&
+  export PATH=$HOME/.local/bin:$PATH
+- psql -c 'create database nestedworld_tests;' -U postgres
+- psql -c 'create extension postgis;' -U postgres -d nestedworld_tests
 script: make test
+after_success:
+- make travis
