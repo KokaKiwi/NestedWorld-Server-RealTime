@@ -1,6 +1,5 @@
 use net::msg::{MessagePart, MessageHeader};
 use net::msg::error::{Result};
-use net::msg::states::auth::Authenticated;
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
