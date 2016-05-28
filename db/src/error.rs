@@ -1,6 +1,16 @@
 //! Database errors definition.
 pub type Result<T> = ::std::result::Result<T, Error>;
 
+macro_rules! impl_sub_error {
+    ($err_ty:ident::$variant:ident($ty:ty)) => {
+        impl From<$ty> for $err_ty {
+            fn from(err: $ty) -> $err_ty {
+                $err_ty::$variant(err.into())
+            }
+        }
+    };
+}
+
 quick_error! {
     #[derive(Debug)]
     pub enum Error {
@@ -24,6 +34,13 @@ quick_error! {
         }
     }
 }
+
+impl_sub_error!(Error::Postgres(::postgres::error::ConnectError));
+impl_sub_error!(Error::Postgres(::postgres::error::Error));
+impl_sub_error!(Error::Postgres(::r2d2_postgres::Error));
+
+impl_sub_error!(Error::Pool(::r2d2::InitializationError));
+impl_sub_error!(Error::Pool(::r2d2::GetTimeout));
 
 quick_error! {
     #[derive(Debug)]
