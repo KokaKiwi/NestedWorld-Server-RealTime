@@ -21,12 +21,10 @@ path = "logs/server.log"
 level = "info"
 appenders = ["stdout"]
 
-[[logger]]
-name = "nestedworld_db"
+[loggers."nestedworld_db"]
 level = "info"
 appenders = ["db"]
 
-[[logger]]
-name = "nestedworld_server"
-level = "info"
+[loggers."nestedworld_server"]
+level = "debug"
 appenders = ["server"]

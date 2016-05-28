@@ -1,3 +1,5 @@
+use db::Database;
+use db::models::token::Session;
 use jwt;
 use rmp::Value;
 use net::msg::MessagePart;
@@ -13,7 +15,7 @@ pub struct Authenticated {
 }
 
 impl Authenticated {
-    pub fn session(&self, secret: &str) -> ::std::result::Result<Session, jwt::errors::Error> {
+    pub fn session(&self, secret: &str) -> ::std::result::Result<SessionData, jwt::errors::Error> {
         let token = try!(jwt::decode(&self.token, secret.as_ref(), TOKEN_ALG));
         Ok(token.claims)
     }
@@ -32,6 +34,17 @@ impl MessagePart for Authenticated {
 }
 
 #[derive(Debug, Clone, PartialEq, RustcDecodable, RustcEncodable)]
-pub struct Session {
+pub struct SessionData {
     pub session_id: u64,
+}
+
+impl SessionData {
+    pub fn db(&self, db: &Database) -> ::db::error::Result<Option<Session>> {
+        let mut session = try!(db.get_model::<Session>(self.session_id as i32));
+        if let Some(ref mut session) = session {
+            let conn = try!(db.get_connection());
+            try!(session.user.fetch(&conn));
+        }
+        Ok(session)
+    }
 }
