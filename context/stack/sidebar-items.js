@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["StackError","Error type returned by stack allocation methods."]],"struct":[["FixedSizeStack","A very simple and straightforward implementation of `Stack`."],["ProtectedFixedSizeStack","A more secure, but slightly slower version of `FixedSizeStack`."],["Stack","Represents any kind of stack memory."]]});

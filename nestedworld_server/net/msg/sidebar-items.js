@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Message",""]],"mod":[["chat",""],["combat",""],["error",""],["result",""],["states",""],["utils",""]],"struct":[["MessageHeader",""]],"trait":[["MessagePart",""]]});

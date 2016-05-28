@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["attack_received",""],["available",""],["data",""],["end",""],["flee",""],["monster_ko",""],["monster_ko_capture",""],["monster_ko_replace",""],["send_attack",""],["start",""]]});

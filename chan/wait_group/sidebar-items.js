@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["WaitGroup","WaitGroup provides synchronization on the completion of threads."]]});

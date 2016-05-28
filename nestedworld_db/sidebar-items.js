@@ -1,0 +1,1 @@
+initSidebarItems({"mod":[["error","Database errors definition."],["models",""]],"struct":[["Config",""],["Database",""]],"type":[["Connection",""]]});
