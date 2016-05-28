@@ -23,6 +23,9 @@ fn main() {
     let server_config = server::Config {
         listen_addr: config.server.listen(),
         secret: config.server.secret.clone(),
+        db: server::db::Config {
+            url: config.database.url.clone(),
+        },
     };
     let handle = server::run(server_config);
     println!("Server started at {}. Press Ctrl+C to stop.", config.server.listen());

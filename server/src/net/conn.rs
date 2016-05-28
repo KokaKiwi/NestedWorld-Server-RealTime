@@ -1,9 +1,9 @@
-use Config;
+use ctx::Context;
 use mioco::tcp::TcpStream;
 use super::msg::{Message, MessagePart};
 use rmp::decode::value::read_value;
 
-pub fn run(_config: Config, conn: TcpStream) {
+pub fn run(_ctx: Context, conn: TcpStream) {
     let mut conn = conn;
 
     debug!("Got connection!");

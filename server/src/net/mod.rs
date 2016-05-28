@@ -1,12 +1,12 @@
+use ctx::Context;
 use mioco;
 use mioco::tcp::TcpListener;
-use super::Config;
 
 #[macro_use] pub mod msg;
 mod conn;
 
-pub(crate) fn run(config: Config) {
-    let listener = TcpListener::bind(&config.listen_addr).unwrap();
+pub(crate) fn run(ctx: Context) {
+    let listener = TcpListener::bind(&ctx.config.listen_addr).unwrap();
 
     loop {
         let conn = match listener.accept() {
@@ -17,7 +17,7 @@ pub(crate) fn run(config: Config) {
             }
         };
 
-        let config = config.clone();
-        mioco::spawn(move || self::conn::run(config, conn));
+        let ctx = ctx.clone();
+        mioco::spawn(move || self::conn::run(ctx, conn));
     }
 }
