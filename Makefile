@@ -13,7 +13,7 @@ test:
 .PHONY: test
 
 travis:
-	cd server && travis-cargo coveralls --no-sudo --verify
+	[ "${TRAVIS_PULL_REQUEST}" != "false" -o "${TRAVIS_BRANCH}" == "develop" ] && cd server && travis-cargo coveralls --no-sudo --verify
 	cargo doc --manifest-path=cli/Cargo.toml --verbose
 	cd cli && travis-cargo doc-upload --branch=develop
 .PHONY: travis
