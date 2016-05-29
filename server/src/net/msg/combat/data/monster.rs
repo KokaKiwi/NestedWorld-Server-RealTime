@@ -9,7 +9,7 @@ pub struct Monster {
     pub id: u32,
     pub name: String,
     pub monster_id: u32,
-    pub user_monster_id: u32,
+    pub user_monster_id: Option<u32>,
     pub hp: u16,
     pub level: u8,
 }

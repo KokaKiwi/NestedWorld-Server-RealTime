@@ -9,8 +9,8 @@ use rmp::Value;
 pub struct Capture {
     pub header: MessageHeader,
     pub auth: Authenticated,
-    pub capture: String,
-    pub name: String,
+    pub capture: bool,
+    pub name: Option<String>,
 }
 
 impl MessagePart for Capture {
