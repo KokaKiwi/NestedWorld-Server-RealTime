@@ -8,11 +8,11 @@ use super::data::user::User;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Available {
     pub header: MessageHeader,
-    pub data: OriginData,
+    pub origin: Origin,
 }
 
 #[derive(Debug, Clone, PartialEq)]
-pub enum OriginData {
+pub enum Origin {
     WildMonster {
         monster_id: u32,
     },
@@ -25,19 +25,19 @@ impl MessagePart for Available {
     fn decode(data: &Value) -> Result<Available> {
         let header = try!(MessageHeader::decode(data));
 
-        let origin: &str = try!(fields::get(data, "origin"));
-        let data = match origin {
-            "wild_monster" => {
+        let origin = try!(fields::get(data, "origin"));
+        let origin = match origin {
+            "wild-monster" => {
                 let monster_id = try!(fields::get(data, "monster_id"));
 
-                OriginData::WildMonster {
+                Origin::WildMonster {
                     monster_id: monster_id,
                 }
             }
             "duel" => {
                 let user = try!(fields::get(data, "user"));
 
-                OriginData::Duel {
+                Origin::Duel {
                     user: user,
                 }
             }
@@ -46,21 +46,21 @@ impl MessagePart for Available {
 
         Ok(Available {
             header: header,
-            data: data,
+            origin: origin,
         })
     }
 
     fn encode(&self, data: &mut Value) {
         data.set("type", "combat:available");
         self.header.encode(data);
-        match self.data {
-            OriginData::WildMonster {
+        match self.origin {
+            Origin::WildMonster {
                 ref monster_id,
             } => {
-                data.set("origin", "wild_monster");
+                data.set("origin", "wild-monster");
                 data.set("monster_id", monster_id);
             }
-            OriginData::Duel {
+            Origin::Duel {
                 ref user,
             } => {
                 data.set("origin", "duel");
