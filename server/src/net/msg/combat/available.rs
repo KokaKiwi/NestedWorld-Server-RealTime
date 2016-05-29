@@ -21,7 +21,6 @@ pub enum OriginData {
     },
 }
 
-
 impl MessagePart for Available {
     fn decode(data: &Value) -> Result<Available> {
         let header = try!(MessageHeader::decode(data));
