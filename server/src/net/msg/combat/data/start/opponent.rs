@@ -10,21 +10,23 @@ use super::super::monster::Monster;
 pub struct Opponent {
     pub monster: Monster,
     pub monsters_count: u8,
-    pub user: User,
+    pub user: Option<User>,
 }
 
 impl MessagePart for Opponent {
     fn decode(data: &Value) -> Result<Opponent> {
         Ok(Opponent {
-            monster: try!(Monster::decode(data)),
+            monster: try!(fields::get(data, "monster")),
             monsters_count: try!(fields::get(data, "monsters_count")),
-            user: try!(User::decode(data)),
+            user: try!(fields::get(data, "user")),
         })
     }
 
     fn encode(&self, data: &mut Value) {
-        self.monster.encode(data);
-        self.user.encode(data);
+        data.set("monster", self.monster.value());
         data.set("monsters_count", &self.monsters_count);
+        if let Some(ref user) = self.user {
+            data.set("user", user.value());
+        }
     }
 }
