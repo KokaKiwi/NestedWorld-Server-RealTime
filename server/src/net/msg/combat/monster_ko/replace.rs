@@ -6,15 +6,15 @@ use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct MonsterKoReplace {
+pub struct Replace {
     pub header: MessageHeader,
     pub auth: Authenticated,
     pub user_monster_id: u32,
 }
 
-impl MessagePart for MonsterKoReplace {
-    fn decode(data: &Value) -> Result<MonsterKoReplace> {
-        Ok(MonsterKoReplace {
+impl MessagePart for Replace {
+    fn decode(data: &Value) -> Result<Replace> {
+        Ok(Replace {
             header: try!(MessageHeader::decode(data)),
             auth: try!(Authenticated::decode(data)),
             user_monster_id: try!(fields::get(data, "user_monster_id")),

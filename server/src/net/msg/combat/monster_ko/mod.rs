@@ -3,6 +3,11 @@ use net::msg::error::{Result};
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
+pub use self::capture::Capture;
+pub use self::replace::Replace;
+
+pub mod capture;
+pub mod replace;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct MonsterKo {

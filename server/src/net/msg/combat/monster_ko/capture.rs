@@ -6,16 +6,16 @@ use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct MonsterKoCapture {
+pub struct Capture {
     pub header: MessageHeader,
     pub auth: Authenticated,
     pub capture: String,
     pub name: String,
 }
 
-impl MessagePart for MonsterKoCapture {
-    fn decode(data: &Value) -> Result<MonsterKoCapture> {
-        Ok(MonsterKoCapture {
+impl MessagePart for Capture {
+    fn decode(data: &Value) -> Result<Capture> {
+        Ok(Capture {
             header: try!(MessageHeader::decode(data)),
             auth: try!(Authenticated::decode(data)),
             capture: try!(fields::get(data, "capture")),
