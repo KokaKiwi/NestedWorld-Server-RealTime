@@ -3,7 +3,7 @@ use net::msg::error::{Result};
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
-use super::data::attack_received::monster::Monster;
+pub use super::data::attack_received::monster::Monster;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct AttackReceived {

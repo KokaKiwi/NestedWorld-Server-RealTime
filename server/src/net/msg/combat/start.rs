@@ -3,8 +3,8 @@ use net::msg::error::{Result};
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
-use super::data::start::user::User;
-use super::data::start::opponent::Opponent;
+pub use super::data::start::user::User;
+pub use super::data::start::opponent::Opponent;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Start {

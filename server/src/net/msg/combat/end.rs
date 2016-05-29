@@ -3,7 +3,7 @@ use net::msg::error::{Result};
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
-use super::data::end::stats::Stats;
+pub use super::data::end::stats::Stats;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct End {
