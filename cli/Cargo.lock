@@ -3,7 +3,7 @@ name = "nestedworld-cli"
 version = "0.1.0"
 dependencies = [
  "clap 2.5.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "clippy 0.0.69 (registry+https://github.com/rust-lang/crates.io-index)",
+ "clippy 0.0.70 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "log4rs 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "nestedworld-server 0.1.0",
@@ -89,7 +89,20 @@ dependencies = [
 
 [[package]]
 name = "clippy"
-version = "0.0.69"
+version = "0.0.70"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "clippy_lints 0.0.70 (registry+https://github.com/rust-lang/crates.io-index)",
+ "quine-mc_cluskey 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "regex-syntax 0.3.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "semver 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "toml 0.1.30 (registry+https://github.com/rust-lang/crates.io-index)",
+ "unicode-normalization 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "clippy_lints"
+version = "0.0.70"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "quine-mc_cluskey 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -231,7 +244,7 @@ version = "0.1.0"
 dependencies = [
  "chrono 0.2.22 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
- "postgres 0.11.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "postgres 0.11.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "quick-error 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "r2d2 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "r2d2_postgres 0.10.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -346,7 +359,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "postgres"
-version = "0.11.7"
+version = "0.11.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "bufstream 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -384,7 +397,7 @@ name = "r2d2_postgres"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
- "postgres 0.11.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "postgres 0.11.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "r2d2 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
