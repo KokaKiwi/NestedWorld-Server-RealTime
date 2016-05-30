@@ -1,0 +1,52 @@
+= Global
+
+Here are described all the structures and messages global to the server.
+
+== States
+
+[[state-authenticated]]
+=== `authenticated`
+
+A message with the state `authenticated` contains informations about a logged user context.
+
+This state is associated with the connection, therefore no specifics message fields are expected and can be associated
+with the `<<msg-authenticate,authenticate>>` message.
+
+.Errors
+* `NotAuthenticated`: The connection doesn't have the `authenticated` state associated.
+
+== Messages
+
+[[msg-authenticate]]
+=== `authenticate`
+
+****
+icon:envelope[] `CLIENT-ONLY`
+****
+
+This message is sent by the client to authenticate it self and associate the connection to an existing
+session, by its token (given by the HTTP API).
+
+WARNING: When successful, this message add the state `<<state-authenticated,authenticated>>` to the connection's
+         associated states.
+
+.Request fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `token`    | `string`   | *(required)* A valid session token given by the HTTP API.
+
+|===
+
+.Errors
+* `InvalidToken`: The session token is invalid.
+
+.Example
+[source,json]
+----
+{
+    "type": "authenticate",
+    "token": "mt11MwyHz0wO2Kz0nQlcl6T4hmWGzTkk"
+}
+----
