@@ -173,13 +173,11 @@ NOTE: If the user send a message to a channel he hasn't joined, no errors are ge
 ----
 {
     "type": "chat:send-message",
-    "token": "2vjc2Qb6s1bviIcbiJ6fenhlfTt0QqsO",
     "channel": "general",
     "message": "Hello world!"
 }
 {
     "type": "chat:send-message",
-    "token": "2vjc2Qb6s1bviIcbiJ6fenhlfTt0QqsO",
     "channel": "general",
     "message": "roll",
     "me": true

@@ -409,7 +409,6 @@ NOTE: TODO: Explain about flee's consequences
 ----
 {
     "type": "combat:flee",
-    "token": "Xd3OLGjbBVZC72Hck5w6VC8aUmFMplpc",
     "combat": 3
 }
 ----
