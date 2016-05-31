@@ -18,6 +18,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "S
 "OPTIONAL" in this document are to be interpreted as described in http://tools.ietf.org/html/rfc2119[RFC 2119].
 
 include::protocol/intro.adoc[leveloffset=+1]
+include::protocol/general.adoc[leveloffset=+1]
 include::protocol/chat.adoc[leveloffset=+1]
 include::protocol/combat.adoc[leveloffset=+1]
 include::protocol/geo.adoc[leveloffset=+1]
