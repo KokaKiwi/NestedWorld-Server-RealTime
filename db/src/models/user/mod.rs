@@ -1,18 +1,14 @@
 use chrono::{DateTime, UTC};
 use super::utils::Model;
 
-#[derive(Debug, Clone)]
-pub enum Gender { Female, Male, Other }
-
-impl Gender {
-    pub fn from_str(gender: &str) -> Option<Gender> {
-        match gender {
-            "female" => Some(Gender::Female),
-            "male" => Some(Gender::Male),
-            "other" => Some(Gender::Other),
-            _ => None,
-        }
-    }
+#[derive(Debug, Clone, ToSql, FromSql)]
+pub enum Gender {
+    #[postgres(name = "female")]
+    Female,
+    #[postgres(name = "male")]
+    Male,
+    #[postgres(name = "other")]
+    Other
 }
 
 #[derive(Debug, Clone)]
@@ -50,7 +46,7 @@ impl Model for User {
                 pseudo: row.get("pseudo"),
                 city: row.get("city"),
                 birth_date: row.get("birth_date"),
-                gender: row.get::<_, Option<String>>("gender").and_then(|gender| Gender::from_str(&gender)),
+                gender: row.get("gender"),
                 avatar: row.get("avatar"),
                 background: row.get("background"),
             }
