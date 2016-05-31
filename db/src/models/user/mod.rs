@@ -2,6 +2,7 @@ use chrono::{DateTime, UTC};
 use super::utils::Model;
 
 #[derive(Debug, Clone, ToSql, FromSql)]
+#[postgres(name = "gender_types")]
 pub enum Gender {
     #[postgres(name = "female")]
     Female,
