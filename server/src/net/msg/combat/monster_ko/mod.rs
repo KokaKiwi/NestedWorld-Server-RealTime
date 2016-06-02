@@ -30,3 +30,9 @@ impl MessagePart for MonsterKo {
         data.set("monster", &self.monster);
     }
 }
+
+message!(Message {
+    type "combat:monster-ko" => Base(MonsterKo),
+    type "combat:monster-ko:capture" => Capture(Capture),
+    type "combat:monster-ko:replace" => Replace(Replace),
+});

@@ -2,6 +2,8 @@ use rmp::Value;
 use self::error::Result;
 use self::utils::fields;
 use self::utils::rmp::{FromValue, ValueExt};
+pub use self::auth::Authenticate;
+pub use self::result::ResultMessage;
 
 #[macro_use] pub mod utils;
 #[macro_use] mod macros;
@@ -46,8 +48,10 @@ impl MessagePart for MessageHeader {
     }
 }
 
-message!(Message:
+message!(Message {
+    #[doc = "Chat messages"]
     ref Chat(self::chat::Message),
-    type "authenticate" => Authenticate(self::auth::Authenticate),
-    type "result" => Result(self::result::ResultMessage),
-);
+    ref Combat(self::combat::Message),
+    type "authenticate" => Authenticate(Authenticate),
+    type "result" => Result(ResultMessage),
+});

@@ -1,39 +1,76 @@
 // Message decoding macro
-macro_rules! message {
-    ($name:ident:
-        $(ref $ref_variant_name:ident($ref_msg_ty:ty),)*
-        $(type $($ty:expr),+ => $variant_name:ident($msg_ty:ty),)*
-    ) => {
+macro_rules! __message {
+    ([DECLARE ENUM] $(#[$meta:meta])* $name:ident () ($($variant_name:ident($msg_ty:ty)($($variant_meta:meta),*),)*)) => {
         #[derive(Debug, Clone, PartialEq)]
+        $(#[$meta])*
         pub enum $name {
-            $($ref_variant_name($ref_msg_ty),)*
-            $($variant_name($msg_ty),)*
+            $($(#[$variant_meta])* $variant_name($msg_ty),)*
+        }
+    };
+    ([DECLARE ENUM] $(#[$meta:meta])* $name:ident ($(#[$variant_meta:meta])* type $($ty:expr),* => $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
+        __message!([DECLARE ENUM] $(#[$meta])* $name ($($e)*) ($($r)* $variant_name($msg_ty)($($variant_meta),*),));
+    };
+    ([DECLARE ENUM] $(#[$meta:meta])* $name:ident ($(#[$variant_meta:meta])* ref $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
+        __message!([DECLARE ENUM] $(#[$meta])* $name ($($e)*) ($($r)* $variant_name($msg_ty)($($variant_meta),*),));
+    };
+
+    ([DECODE TEST REFS] $name:ident ($data:expr) ()) => {};
+    ([DECODE TEST REFS] $name:ident ($data:expr) ($(#[$meta:meta])* type $($ty:expr),* => $variant_name:ident($msg_ty:ty), $($e:tt)*)) => {
+        __message!([DECODE TEST REFS] $name ($data) ($($e)*));
+    };
+    ([DECODE TEST REFS] $name:ident ($data:expr) ($(#[$meta:meta])* ref $variant_name:ident($msg_ty:ty), $($e:tt)*)) => {
+        if let Ok(msg) = $crate::net::msg::MessagePart::decode($data) {
+            return Ok($name::$variant_name(msg));
         }
 
+        __message!([DECODE TEST REFS] $name ($data) ($($e)*));
+    };
+    ([DECODE TEST TYPES] $name:ident ($data:expr, $msg_type:expr) () ($(($($ty:expr),*) => $variant_name:ident,)*)) => {
+        match $msg_type {
+            $($($ty)|* => $crate::net::msg::MessagePart::decode($data).map($name::$variant_name),)*
+            _ => Err($crate::net::msg::error::Error::InvalidField("type", format!("Unknown message type `{}`", $msg_type))),
+        }
+    };
+    ([DECODE TEST TYPES] $name:ident ($data:expr, $msg_type:expr) ($(#[$meta:meta])* type $($ty:expr),* => $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
+        __message!([DECODE TEST TYPES] $name ($data, $msg_type) ($($e)*) (($($ty),*) => $variant_name,$($r)*));
+    };
+    ([DECODE TEST TYPES] $name:ident ($data:expr, $msg_type:expr) ($(#[$meta:meta])* ref $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
+        __message!([DECODE TEST TYPES] $name ($data, $msg_type) ($($e)*) ($($r)*));
+    };
+
+    ([ENCODE MESSAGE] $name:ident ($self_:expr, $data:expr) () ($($variant_name:ident,)*)) => {
+        match $self_ {
+            $($name::$variant_name(ref msg) => msg.encode($data),)*
+        }
+    };
+    ([ENCODE MESSAGE] $name:ident ($self_:expr, $data:expr) ($(#[$meta:meta])* type $($ty:expr),* => $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
+        __message!([ENCODE MESSAGE] $name ($self_, $data) ($($e)*) ($variant_name, $($r)*));
+    };
+    ([ENCODE MESSAGE] $name:ident ($self_:expr, $data:expr) ($(#[$meta:meta])* ref $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
+        __message!([ENCODE MESSAGE] $name ($self_, $data) ($($e)*) ($variant_name, $($r)*));
+    };
+
+    ([IMPL MESSAGE] $name:ident ($($e:tt)*)) => {
         impl $crate::net::msg::MessagePart for $name {
             fn decode(data: &$crate::rmp::Value) -> $crate::net::msg::error::Result<$name> {
-                use $crate::net::msg::error::Error;
-                use $crate::net::msg::utils::fields;
+                __message!([DECODE TEST REFS] $name (data) ($($e)*));
 
-                $({
-                    if let Ok(msg) = MessagePart::decode(data) {
-                        return Ok($name::$ref_variant_name(msg));
-                    }
-                })*
-
-                let msg_type: &str = try!(fields::get(data, "type"));
-                match msg_type {
-                    $($($ty)|* => $crate::net::msg::MessagePart::decode(data).map($name::$variant_name),)*
-                    _ => Err(Error::InvalidField("type", format!("Unknown message type `{}`", msg_type))),
-                }
+                let msg_type: &str = try!($crate::net::msg::utils::fields::get(data, "type"));
+                __message!([DECODE TEST TYPES] $name (data, msg_type) ($($e)*) ())
             }
 
             fn encode(&self, data: &mut $crate::rmp::Value) {
-                match *self {
-                    $($name::$ref_variant_name(ref msg) => msg.encode(data),)*
-                    $($name::$variant_name(ref msg) => msg.encode(data),)*
-                }
+                __message!([ENCODE MESSAGE] $name (*self, data) ($($e)*) ());
             }
         }
+    };
+}
+
+macro_rules! message {
+    ($(#[$meta:meta])* $name:ident {
+        $($e:tt)*
+    }) => {
+        __message!([DECLARE ENUM] $(#[$meta])* $name ($($e)*) ());
+        __message!([IMPL MESSAGE] $name ($($e)*));
     };
 }
