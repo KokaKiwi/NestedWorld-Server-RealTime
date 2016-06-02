@@ -32,7 +32,7 @@ macro_rules! __message {
         }
     };
     ([DECODE TEST TYPES] $name:ident ($data:expr, $msg_type:expr) ($(#[$meta:meta])* type $($ty:expr),* => $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
-        __message!([DECODE TEST TYPES] $name ($data, $msg_type) ($($e)*) (($($ty),*) => $variant_name,$($r)*));
+        __message!([DECODE TEST TYPES] $name ($data, $msg_type) ($($e)*) ($($r)* ($($ty),*) => $variant_name,));
     };
     ([DECODE TEST TYPES] $name:ident ($data:expr, $msg_type:expr) ($(#[$meta:meta])* ref $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
         __message!([DECODE TEST TYPES] $name ($data, $msg_type) ($($e)*) ($($r)*));
@@ -44,10 +44,10 @@ macro_rules! __message {
         }
     };
     ([ENCODE MESSAGE] $name:ident ($self_:expr, $data:expr) ($(#[$meta:meta])* type $($ty:expr),* => $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
-        __message!([ENCODE MESSAGE] $name ($self_, $data) ($($e)*) ($variant_name, $($r)*));
+        __message!([ENCODE MESSAGE] $name ($self_, $data) ($($e)*) ($($r)* $variant_name,));
     };
     ([ENCODE MESSAGE] $name:ident ($self_:expr, $data:expr) ($(#[$meta:meta])* ref $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
-        __message!([ENCODE MESSAGE] $name ($self_, $data) ($($e)*) ($variant_name, $($r)*));
+        __message!([ENCODE MESSAGE] $name ($self_, $data) ($($e)*) ($($r)* $variant_name,));
     };
 
     ([IMPL MESSAGE] $name:ident ($($e:tt)*)) => {
