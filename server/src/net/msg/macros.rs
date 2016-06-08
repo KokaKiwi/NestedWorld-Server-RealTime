@@ -1,4 +1,5 @@
 // Message decoding macro
+// Very cryptic macro, but hopefully one day it will be replaced by something better.
 macro_rules! __message {
     ([DECLARE ENUM] $(#[$meta:meta])* $name:ident () ($($variant_name:ident($msg_ty:ty)($($variant_meta:meta),*),)*)) => {
         #[derive(Debug, Clone, PartialEq)]

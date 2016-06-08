@@ -51,6 +51,7 @@ impl MessagePart for MessageHeader {
 message!(Message {
     #[doc = "Chat messages"]
     ref Chat(self::chat::Message),
+    #[doc = "Combat messages"]
     ref Combat(self::combat::Message),
     type "authenticate" => Authenticate(Authenticate),
     type "result" => Result(ResultMessage),
