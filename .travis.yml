@@ -9,7 +9,7 @@ addons:
     - binutils-dev
   postgresql: 9.3
 rust:
-- nightly-2016-05-16
+- nightly-2016-06-07
 services:
 - postgresql
 env:
