@@ -15,3 +15,13 @@ pub mod flee;
 pub mod monster_ko;
 pub mod send_attack;
 pub mod start;
+
+message!(Message {
+    type "combat:available" => Available(Available),
+    type "combat:start" => Start(Start),
+    type "combat:send-attack" => SendAttack(SendAttack),
+    type "combat:attack-received" => AttackReceived(AttackReceived),
+    type "combat:flee" => Flee(Flee),
+    type "combat:end" => End(End),
+    ref MonsterKo(self::monster_ko::Message),
+});

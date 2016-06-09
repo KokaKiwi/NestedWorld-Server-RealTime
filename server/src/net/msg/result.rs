@@ -22,6 +22,21 @@ pub enum ResultData {
     },
 }
 
+impl ResultData {
+    pub fn ok(data: Option<Value>) -> ResultData {
+        let data = data.unwrap_or_else(|| rmp_map![]);
+        ResultData::Success(data)
+    }
+
+    pub fn err<K: Into<String>, M: Into<String>>(kind: K, message: M, data: Option<Value>) -> ResultData {
+        ResultData::Error {
+            kind: kind.into(),
+            message: message.into(),
+            data: data.unwrap_or_else(|| rmp_map![]),
+        }
+    }
+}
+
 impl MessagePart for ResultMessage {
     fn decode(data: &Value) -> Result<ResultMessage> {
         let header = try!(MessageHeader::decode(data));

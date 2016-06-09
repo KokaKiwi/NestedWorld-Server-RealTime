@@ -1,19 +1,18 @@
 use super::utils::Model;
 
-#[derive(Debug, Clone)]
-pub enum MonsterType { Water, Fire, Earth, Electric, Plant }
-
-impl MonsterType {
-    pub fn from_str(monster_type: &str) -> MonsterType {
-        match monster_type {
-            "water" => MonsterType::Water,
-            "fire" => MonsterType::Fire,
-            "earth" => MonsterType::Earth,
-            "electric" => MonsterType::Electric,
-            "plant" => MonsterType::Plant,
-            _ => MonsterType::Fire,
-        }
-    }
+#[derive(Debug, Clone, ToSql, FromSql)]
+#[postgres(name = "monster_type")]
+pub enum MonsterType {
+    #[postgres(name = "water")]
+    Water,
+    #[postgres(name = "fire")]
+    Fire,
+    #[postgres(name = "earth")]
+    Earth,
+    #[postgres(name = "electric")]
+    Electric,
+    #[postgres(name = "plant")]
+    Plant
 }
 
 #[derive(Debug, Clone)]
@@ -40,7 +39,7 @@ impl Model for Monster {
                 id: id,
 
                 name: row.get("name"),
-                monster_type: MonsterType::from_str(&row.get::<_, String>("type")),
+                monster_type: row.get("type"),
 
                 attack: row.get("attack"),
                 hp: row.get("hp"),

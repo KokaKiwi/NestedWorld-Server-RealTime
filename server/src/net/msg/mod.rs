@@ -2,14 +2,16 @@ use rmp::Value;
 use self::error::Result;
 use self::utils::fields;
 use self::utils::rmp::{FromValue, ValueExt};
+pub use self::auth::Authenticate;
+pub use self::result::ResultMessage;
 
 #[macro_use] pub mod utils;
 #[macro_use] mod macros;
+pub mod auth;
 pub mod chat;
 pub mod combat;
 pub mod error;
 pub mod result;
-pub mod states;
 
 pub trait MessagePart: Sized {
     fn decode(data: &Value) -> Result<Self>;
@@ -46,7 +48,11 @@ impl MessagePart for MessageHeader {
     }
 }
 
-message!(Message:
+message!(Message {
+    #[doc = "Chat messages"]
     ref Chat(self::chat::Message),
-    type "result" => Result(self::result::ResultMessage),
-);
+    #[doc = "Combat messages"]
+    ref Combat(self::combat::Message),
+    type "authenticate" => Authenticate(Authenticate),
+    type "result" => Result(ResultMessage),
+});

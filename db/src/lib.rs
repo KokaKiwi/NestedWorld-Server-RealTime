@@ -1,3 +1,6 @@
+#![feature(plugin, custom_derive)]
+#![plugin(postgres_derive_macros)]
+
 extern crate chrono;
 #[macro_use] extern crate log;
 #[macro_use] extern crate postgres;

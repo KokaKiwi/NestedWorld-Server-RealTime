@@ -1,34 +1,38 @@
 use db::Database;
 use db::models::token::Session;
-use jwt;
-use rmp::Value;
-use net::msg::MessagePart;
 use net::msg::error::Result;
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
+use rmp::Value;
+use super::{MessagePart, MessageHeader};
 
-const TOKEN_ALG: jwt::Algorithm = jwt::Algorithm::HS512;
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Authenticated {
+#[derive(Debug, Clone, PartialEq)]
+pub struct Authenticate {
+    pub header: MessageHeader,
     pub token: String,
 }
 
-impl Authenticated {
-    pub fn session(&self, secret: &str) -> ::std::result::Result<SessionData, jwt::errors::Error> {
-        let token = try!(jwt::decode(&self.token, secret.as_ref(), TOKEN_ALG));
+impl Authenticate {
+    pub fn session(&self, _secret: &str) -> ::std::result::Result<SessionData, ::jwt::Error> {
+        use jwt::{Header, Token};
+
+        let token: Token<Header, SessionData> = try!(Token::parse(&self.token));
+        // TODO: Verify the token.
         Ok(token.claims)
     }
 }
 
-impl MessagePart for Authenticated {
-    fn decode(data: &Value) -> Result<Self> {
-        Ok(Authenticated {
+impl MessagePart for Authenticate {
+    fn decode(data: &Value) -> Result<Authenticate> {
+        Ok(Authenticate {
+            header: try!(MessageHeader::decode(data)),
             token: try!(fields::get(data, "token")),
         })
     }
 
     fn encode(&self, data: &mut Value) {
+        data.set("type", "authenticate");
+        self.header.encode(data);
         data.set("token", &self.token);
     }
 }
