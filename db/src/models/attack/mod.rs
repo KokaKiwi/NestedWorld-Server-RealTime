@@ -1,18 +1,16 @@
 use super::utils::Model;
 
-#[derive(Debug, Clone)]
-pub enum AttackType { Attack, AttackSp, Defense, DefenseSp}
-
-impl AttackType {
-    pub fn from_str(attack_type: &str) -> AttackType {
-        match attack_type {
-            "attack" => AttackType::Attack,
-            "attacksp" => AttackType::AttackSp,
-            "defense" => AttackType::Defense,
-            "defensesp" => AttackType::DefenseSp,
-            _ => AttackType::Attack,
-        }
-    }
+#[derive(Debug, Clone, ToSql, FromSql)]
+#[postgres(name = "attack_type")]
+pub enum AttackType {
+    #[postgres(name = "attack")]
+    Attack,
+    #[postgres(name = "attacksp")]
+    AttackSp,
+    #[postgres(name = "defense")]
+    Defense,
+    #[postgres(name = "defensesp")]
+    DefenseSp
 }
 
 #[derive(Debug, Clone)]
@@ -35,7 +33,7 @@ impl Model for Attack {
                 id: id,
 
                 name: row.get("name"),
-                attack_type: AttackType::from_str(&row.get::<_, String>("type")),
+                attack_type: row.get("type"),
             }
         });
         Ok(attack)
