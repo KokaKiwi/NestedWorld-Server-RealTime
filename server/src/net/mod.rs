@@ -4,6 +4,7 @@ use mioco::tcp::TcpListener;
 
 #[macro_use] pub mod msg;
 mod conn;
+mod handlers;
 
 pub(crate) fn run(ctx: Context) {
     let listener = TcpListener::bind(&ctx.config.listen_addr).unwrap();
