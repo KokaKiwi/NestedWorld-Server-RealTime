@@ -44,8 +44,8 @@ pub struct Session {
 impl Model for Session {
     fn get_by_id(conn: &::postgres::Connection, id: i32) -> ::postgres::Result<Option<Session>> {
         let query = r#"
-            SELECT application_id, user_id, start, end, data FROM sessions
-            WHERE id = $1
+            SELECT "application_id", "user_id", "start", "end", "data" FROM "sessions"
+            WHERE "id" = $1
         "#;
         let rows = try!(conn.query(query, &[&id]));
         let session = rows.iter().next().map(|row| Session {

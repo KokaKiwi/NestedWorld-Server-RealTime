@@ -1,4 +1,4 @@
-use chrono::{DateTime, UTC};
+use chrono::{DateTime, NaiveDate, UTC};
 use super::utils::Model;
 
 #[derive(Debug, Clone, ToSql, FromSql)]
@@ -22,7 +22,7 @@ pub struct User {
 
     pub pseudo: String,
     pub city: Option<String>,
-    pub birth_date: Option<DateTime<UTC>>,
+    pub birth_date: Option<NaiveDate>,
     pub gender: Option<Gender>,
     pub avatar: Option<String>,
     pub background: Option<String>,
