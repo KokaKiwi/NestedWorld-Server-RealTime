@@ -1,7 +1,7 @@
 #![feature(pub_restricted, specialization)]
 
 #[macro_use] extern crate chan;
-extern crate jsonwebtoken as jwt;
+extern crate jwt;
 #[macro_use] extern crate log;
 extern crate mioco;
 pub extern crate nestedworld_db as db;
