@@ -1,4 +1,4 @@
-use super::utils::Model;
+use super::utils::{Model, Relation};
 use super::monster::Monster;
 use super::user::User;
 
@@ -13,9 +13,8 @@ pub struct UserMonster {
     pub experience: i32,
     pub level: i32,
 
-    //TODO : make something for user and monster
-    // pub user: User,
-    // pub monster: Monster,
+    pub user: Relation<User>,
+    pub monster: Relation<Monster>,
 }
 
 impl Model for UserMonster {
@@ -37,6 +36,8 @@ impl Model for UserMonster {
                 experience: row.get("experience"),
                 level: row.get("level"),
 
+                user: Relation::new(row.get("user")),
+                monster: Relation::new(row.get("monster")),
             }
         });
         Ok(user_monster)
