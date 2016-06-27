@@ -5,6 +5,9 @@ use net::handlers::helpers::result::handle_with_result;
 
 pub fn handle(conn: &mut Connection, msg: Flee) {
     handle_with_result(conn, &msg.header, |conn| {
-        return ResultData::ok(None);
+        match conn.session {
+            Some(_) => { return ResultData::ok(None)},
+            None => { return ResultData::err("NotAuthenticated", "You are not authenticate on the server", None)}
+        }
     })
 }
