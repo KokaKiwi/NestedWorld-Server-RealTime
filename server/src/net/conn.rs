@@ -1,6 +1,7 @@
 use ctx::Context;
 use db::models::token::Session;
 use mioco::tcp::TcpStream;
+use mioco;
 use super::msg::{Message, MessagePart};
 use rmp::decode::value::read_value;
 use rmp::encode::value::Error as EncodeError;
@@ -31,6 +32,10 @@ pub fn run(ctx: Context, conn: TcpStream) {
     let mut conn = Connection::new(ctx, conn);
 
     debug!("Got connection!");
+    mioco::spawn(move || read_and_decode(&mut conn));
+}
+
+pub fn read_and_decode(conn: &mut Connection) {
     loop {
         let msg = match read_value(&mut conn.stream) {
             Ok(msg) => msg,
@@ -49,7 +54,6 @@ pub fn run(ctx: Context, conn: TcpStream) {
                 continue;
             }
         };
-
-        handlers::handle(&mut conn, msg);
+        handlers::handle(conn, msg);
     }
 }
