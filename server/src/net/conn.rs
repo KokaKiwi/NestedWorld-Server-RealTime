@@ -6,7 +6,9 @@ use super::msg::{Message, MessagePart};
 use rmp::decode::value::read_value;
 use rmp::encode::value::Error as EncodeError;
 use super::handlers;
+use super::event;
 
+#[derive(Clone)]
 pub struct Connection {
     pub ctx: Context,
     pub stream: TcpStream,
@@ -32,7 +34,8 @@ pub fn run(ctx: Context, conn: TcpStream) {
     let mut conn = Connection::new(ctx, conn);
 
     debug!("Got connection!");
-    mioco::spawn(move || read_and_decode(&mut conn));
+    mioco::spawn(move || read_and_decode(conn.clone()));
+    mioco::spawn(move || event::send_random_combat(conn.clone()));
 }
 
 pub fn read_and_decode(conn: &mut Connection) {
