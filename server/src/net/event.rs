@@ -25,7 +25,9 @@ pub fn send_random_combat(conn: &mut Connection) {
         };
 
         match conn.send(msg) {
-            Ok(_) => {}
+            Ok(_) => {
+                debug!("A random combat have been send.");
+            }
             Err(e) => {
                 debug!("Error when sending result: {}", e);
             }

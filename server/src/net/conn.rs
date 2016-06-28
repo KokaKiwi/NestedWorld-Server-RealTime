@@ -8,7 +8,6 @@ use rmp::encode::value::Error as EncodeError;
 use super::handlers;
 use super::event;
 
-#[derive(Clone)]
 pub struct Connection {
     pub ctx: Context,
     pub stream: TcpStream,
@@ -28,14 +27,40 @@ impl Connection {
         use rmp::encode::value::write_value;
         write_value(&mut self.stream, &msg.value())
     }
+
+    pub fn try_clone(&self) -> ::std::io::Result<Connection> {
+        Ok(Connection {
+          ctx: self.ctx.clone(),
+          stream: try!(self.stream.try_clone()),
+          session: self.session.clone(),
+        })
+    }
 }
 
 pub fn run(ctx: Context, conn: TcpStream) {
-    let mut conn = Connection::new(ctx, conn);
+    let conn = Connection::new(ctx, conn);
 
     debug!("Got connection!");
-    mioco::spawn(move || read_and_decode(conn.clone()));
-    mioco::spawn(move || event::send_random_combat(conn.clone()));
+
+    match conn.try_clone() {
+        Ok(cloned_conn) => {
+            let mut value = cloned_conn;
+            mioco::spawn(move || read_and_decode(&mut value));
+        },
+        Err(err) => {
+            debug!("Error when trying to clone TcpStream connection : {}", err);
+        },
+    }
+
+    match conn.try_clone() {
+        Ok(cloned_conn) => {
+            let mut value = cloned_conn;
+            mioco::spawn(move || event::send_random_combat(&mut value));
+        },
+        Err(err) => {
+            debug!("Error when trying to clone TcpStream connection : {}", err);
+        },
+    }
 }
 
 pub fn read_and_decode(conn: &mut Connection) {
