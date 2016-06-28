@@ -43,9 +43,8 @@ pub fn run(ctx: Context, conn: TcpStream) {
     debug!("Got connection!");
 
     match conn.try_clone() {
-        Ok(cloned_conn) => {
-            let mut value = cloned_conn;
-            mioco::spawn(move || read_and_decode(&mut value));
+        Ok(mut conn) => {
+            mioco::spawn(move || read_and_decode(&mut conn));
         },
         Err(err) => {
             debug!("Error when trying to clone TcpStream connection : {}", err);
@@ -53,9 +52,8 @@ pub fn run(ctx: Context, conn: TcpStream) {
     }
 
     match conn.try_clone() {
-        Ok(cloned_conn) => {
-            let mut value = cloned_conn;
-            mioco::spawn(move || event::send_random_combat(&mut value));
+        Ok(mut conn) => {
+            mioco::spawn(move || event::send_random_combat(&mut conn));
         },
         Err(err) => {
             debug!("Error when trying to clone TcpStream connection : {}", err);
