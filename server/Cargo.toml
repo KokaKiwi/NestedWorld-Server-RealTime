@@ -10,6 +10,7 @@ log = "0.3.5"
 mioco = "0.7.0"
 nestedworld-db = { path = "../db" }
 quick-error = "1.0.0"
+rand = "0.3"
 rmp = "^0.7"
 rustc-serialize = "^0.3"
-uuid = { version = "0.2.2", features = ["v4"] }
+uuid = { version = "0.2", features = ["use_std", "v4"] }

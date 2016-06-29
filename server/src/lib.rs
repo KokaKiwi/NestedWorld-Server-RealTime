@@ -5,6 +5,7 @@ extern crate jwt;
 extern crate mioco;
 pub extern crate nestedworld_db as db;
 #[macro_use] extern crate quick_error;
+extern crate rand;
 extern crate rmp;
 extern crate rustc_serialize;
 extern crate uuid;
