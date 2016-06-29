@@ -1,6 +1,5 @@
 #![feature(pub_restricted, specialization)]
 
-#[macro_use] extern crate chan;
 extern crate jwt;
 #[macro_use] extern crate log;
 extern crate mioco;
@@ -8,6 +7,7 @@ pub extern crate nestedworld_db as db;
 #[macro_use] extern crate quick_error;
 extern crate rmp;
 extern crate rustc_serialize;
+extern crate uuid;
 
 use ctx::Context;
 use mioco::JoinHandle;

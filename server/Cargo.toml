@@ -4,7 +4,6 @@ version = "0.1.0"
 authors = ["KokaKiwi <kokakiwi@kokakiwi.net>"]
 
 [dependencies]
-chan = "0.1.14"
 clippy = { version = "*", optional = true }
 jwt = "0.4.0"
 log = "0.3.5"
@@ -13,3 +12,4 @@ nestedworld-db = { path = "../db" }
 quick-error = "1.0.0"
 rmp = "^0.7"
 rustc-serialize = "^0.3"
+uuid = { version = "0.2.2", features = ["v4"] }

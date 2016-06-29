@@ -36,6 +36,18 @@ pub struct MessageHeader {
     pub id: Option<String>,
 }
 
+impl MessageHeader {
+    pub fn new() -> MessageHeader {
+        use uuid::Uuid;
+
+        let id = Uuid::new_v4();
+
+        MessageHeader {
+            id: Some(id.hyphenated().to_string()),
+        }
+    }
+}
+
 impl MessagePart for MessageHeader {
     fn decode(data: &Value) -> Result<MessageHeader> {
         Ok(MessageHeader {
