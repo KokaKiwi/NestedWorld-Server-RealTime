@@ -12,7 +12,8 @@ pub fn send_random_combat(conn: &mut Connection) {
     let between = Range::new(0, 140);
 
     loop {
-        let time = 120 + between.ind_sample(&mut rng) * 1000;
+        //TODO : replace current timer
+        let time = 60 * 1000;
         mioco::sleep_ms(time);
 
         let msg = Available {
