@@ -3,6 +3,7 @@ use net::msg::combat::Available;
 use net::msg::combat::available::Origin;
 use net::msg::MessageHeader;
 use mioco;
+use std;
 use rand::distributions::{IndependentSample, Range};
 use rand;
 use uuid::Uuid;
@@ -12,8 +13,8 @@ pub fn send_random_combat(conn: &mut Connection) {
     let between = Range::new(0, 140);
 
     loop {
-        let time = 120 + between.ind_sample(&mut rng) * 1000;
-        mioco::sleep_ms(time);
+        let time =std::time::Duration::from_millis(120 + between.ind_sample(&mut rng));
+        mioco::sleep(time);
 
         let msg = Available {
             header: MessageHeader {
