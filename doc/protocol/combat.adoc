@@ -125,6 +125,23 @@ and ask for confirmation to start it.
 
 |===
 
+[[msg-combat-selected-monsters]]
+=== `combat:selected-monsters`
+
+****
+icon:envelope[] `CLIENT-ONLY`
+****
+
+.Request fields
+[cols="15,20,65"]
+|===
+| Field name | Field type                                        | Description
+| `monster`  | array[`<<struct-combat-monster,combat:Monster>>`] | *(required)* Selected monsters.
+|===
+
+.Errors
+* `InvalidMonster`: Nonexistent monster or not a valid monster. (monster already K.O.)
+
 [[msg-combat-start]]
 === `combat:start`
 
