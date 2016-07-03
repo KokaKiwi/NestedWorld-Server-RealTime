@@ -136,7 +136,7 @@ icon:envelope[] `CLIENT-ONLY`
 [cols="15,20,65"]
 |===
 | Field name | Field type                                        | Description
-| `monsters`  | array[`<<struct-combat-monster,combat:Monster>>`] | *(required)* Selected monsters.
+| `monsters`  | `array[integer]` | *(required)* User Monster IDs.
 |===
 
 .Errors
