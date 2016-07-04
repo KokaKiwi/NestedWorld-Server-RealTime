@@ -21,7 +21,7 @@ impl MessagePart for Start {
     fn decode(data: &Value) -> Result<Start> {
         Ok(Start {
             header: try!(MessageHeader::decode(data)),
-            id: try!(fields::get(data, "id")),
+            combat_id: try!(fields::get(data, "id")),
             user: try!(fields::get(data, "user")),
             opponent: try!(fields::get(data, "opponent")),
             combat_type: try!(fields::get(data, "combat_type")),
