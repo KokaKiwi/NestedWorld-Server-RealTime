@@ -119,9 +119,10 @@ and ask for confirmation to start it.
 .Response fields
 [cols="15,20,65"]
 |===
-| Field name   | Field type | Description
+| Field name   | Field type       | Description
 
-| `accept`     | `boolean`  | *(required)* If the user accept or no the combat request.
+| `accept`     | `boolean`        | *(required)* If the user accept or no the combat request.
+| `monsters`   | `array[integer]` | *(required if `accept` is true)* UserMonster IDs selected for the combat 
 
 |===
 

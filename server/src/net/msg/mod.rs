@@ -30,6 +30,11 @@ impl<'a, M: MessagePart> FromValue<'a> for M {
     }
 }
 
+pub trait MessageFull: MessagePart {
+    fn header(&self) -> &MessageHeader;
+    fn header_mut(&mut self) -> &mut MessageHeader;
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct MessageHeader {
     /// The message ID, if any.
@@ -37,14 +42,12 @@ pub struct MessageHeader {
 }
 
 impl MessageHeader {
-    pub fn new() -> MessageHeader {
+    pub fn ensure_id(&mut self) -> String {
         use uuid::Uuid;
 
-        let id = Uuid::new_v4();
-
-        MessageHeader {
-            id: Some(id.hyphenated().to_string()),
-        }
+        let id = self.id.take().unwrap_or_else(|| Uuid::new_v4().hyphenated().to_string());
+        self.id = Some(id.clone());
+        id
     }
 }
 

@@ -1,4 +1,4 @@
-use net::msg::{MessagePart, MessageHeader};
+use net::msg::{MessagePart, MessageFull, MessageHeader};
 use net::msg::error::{Result, Error};
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
@@ -67,5 +67,15 @@ impl MessagePart for Available {
                 data.set("user", user.value());
             }
         }
+    }
+}
+
+impl MessageFull for Available {
+    fn header(&self) -> &MessageHeader {
+        &self.header
+    }
+
+    fn header_mut(&mut self) -> &mut MessageHeader {
+        &mut self.header
     }
 }

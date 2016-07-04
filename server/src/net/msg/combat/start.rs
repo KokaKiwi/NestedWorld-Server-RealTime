@@ -1,4 +1,4 @@
-use net::msg::{MessagePart, MessageHeader};
+use net::msg::{MessagePart, MessageFull, MessageHeader};
 use net::msg::error::{Result};
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
@@ -40,5 +40,15 @@ impl MessagePart for Start {
         data.set("combat_type", &self.combat_type);
         data.set("env", &self.env);
         data.set("first", &self.first);
+    }
+}
+
+impl MessageFull for Start {
+    fn header(&self) -> &MessageHeader {
+        &self.header
+    }
+
+    fn header_mut(&mut self) -> &mut MessageHeader {
+        &mut self.header
     }
 }
