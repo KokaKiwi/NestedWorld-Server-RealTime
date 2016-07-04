@@ -9,7 +9,7 @@ pub use super::data::start::opponent::Opponent;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Start {
     pub header: MessageHeader,
-    pub id: u32,
+    pub combat_id: u32,
     pub user: User,
     pub opponent: Opponent,
     pub combat_type: String,
@@ -34,7 +34,7 @@ impl MessagePart for Start {
     fn encode(&self, data: &mut Value) {
         data.set("type", "combat:start");
         self.header.encode(data);
-        data.set("id", &self.id);
+        data.set("combat_id", &self.combat_id);
         data.set("user", self.user.value());
         data.set("opponent", self.opponent.value());
         data.set("combat_type", &self.combat_type);

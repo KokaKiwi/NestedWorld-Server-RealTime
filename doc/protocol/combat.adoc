@@ -122,7 +122,7 @@ and ask for confirmation to start it.
 | Field name   | Field type       | Description
 
 | `accept`     | `boolean`        | *(required)* If the user accept or no the combat request.
-| `monsters`   | `array[integer]` | *(required if `accept` is true)* UserMonster IDs selected for the combat 
+| `monsters`   | `array[integer]` | *(required if `accept` is true)* UserMonster IDs selected for the combat
 
 |===
 
@@ -136,16 +136,16 @@ icon:envelope[] `SERVER-ONLY`, `NO RESPONSED NEEDED`
 .Request fields
 [cols="15,20,65"]
 |===
-| Field name | Field type                                                   | Description
+| Field name    | Field type                                                   | Description
 
-| `id`       | `integer`                                                    | *(required)* Combat ID
-| `user`     | `<<msg-combat-start-struct-user,combat:start:User>>`         | *(required)* Informations about user's side.
-| `opponent` | `<<msg-combat-start-struct-opponent,combat:start:Opponent>>` | *(required)* Informations about opponent's side.
-| `type`     | `string`                                                     | *(required)* Combat type:
-                                                                              `wild`, `dungeon` or `duel`
-| `env`      | `string`                                                     | *(required)* Combat environment:
-                                                                              `city`, `dungeon`, `campaign`, `sea`, etc.
-| `first`    | `boolean`                                                    | *(required)* Is the user first to move?
+| `combat_id`   | `integer`                                                    | *(required)* Combat ID
+| `user`        | `<<msg-combat-start-struct-user,combat:start:User>>`         | *(required)* Informations about user's side.
+| `opponent`    | `<<msg-combat-start-struct-opponent,combat:start:Opponent>>` | *(required)* Informations about opponent's side.
+| `combat_type` | `string`                                                     | *(required)* Combat type:
+                                                                                 `wild`, `dungeon` or `duel`
+| `env`         | `string`                                                     | *(required)* Combat environment:
+                                                                                 `city`, `dungeon`, `campaign`, `sea`, etc.
+| `first`       | `boolean`                                                    | *(required)* Is the user first to move?
 
 |===
 
