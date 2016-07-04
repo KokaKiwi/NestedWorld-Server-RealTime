@@ -1,4 +1,4 @@
-use super::{MessagePart, MessageHeader};
+use super::{MessagePart, MessageFull, MessageHeader};
 use super::error::{Result, Error};
 use super::utils::fields;
 use super::utils::rmp::ValueExt;
@@ -92,5 +92,15 @@ impl MessagePart for ResultMessage {
                 data.extend(r_data);
             }
         }
+    }
+}
+
+impl MessageFull for ResultMessage {
+    fn header(&self) -> &MessageHeader {
+        &self.header
+    }
+
+    fn header_mut(&mut self) -> &mut MessageHeader {
+        &mut self.header
     }
 }
