@@ -1,4 +1,4 @@
-use net::msg::{MessagePart, MessageHeader};
+use net::msg::{MessagePart, MessageFull, MessageHeader};
 use net::msg::error::{Result};
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
@@ -23,5 +23,15 @@ impl MessagePart for Replace {
         data.set("type", "combat:monster-ko:replace");
         self.header.encode(data);
         data.set("user_monster_id", &self.user_monster_id);
+    }
+}
+
+impl MessageFull for Replace {
+    fn header(&self) -> &MessageHeader {
+        &self.header
+    }
+
+    fn header_mut(&mut self) -> &mut MessageHeader {
+        &mut self.header
     }
 }
