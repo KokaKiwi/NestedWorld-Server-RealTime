@@ -2,6 +2,8 @@ use super::conn::Connection;
 use net::msg::combat::Available;
 use net::msg::combat::available::Origin;
 use net::msg::MessageHeader;
+use net::msg::Message;
+use net::msg::result::ResultData;
 use mioco;
 use std;
 use rand::distributions::{IndependentSample, Range};
@@ -25,13 +27,29 @@ pub fn send_random_combat(conn: &mut Connection) {
             },
         };
 
-        match conn.send(msg) {
-            Ok(_) => {
-                debug!("A random combat have been send.");
-            }
-            Err(e) => {
-                debug!("Error when sending result: {}", e);
-            }
+        let rx = match conn.send_request(msg) {
+          Ok(rx) => rx,
+          Err(e) => {
+            debug!("{}", e);
+            continue;
+          }
+        };
+
+        let msg = match rx.recv() {
+          Ok(Message::Result(msg)) => msg,
+          _ => {
+            debug!("Inappropirate type of packet",);
+            continue;
+          }
+        };
+
+        match msg.data {
+          ResultData::Success(ref data) => {
+              //start_combat(data);
+          },
+          ResultData::Error { kind, message, data } => {
+              continue;
+          }
         }
     }
 }
