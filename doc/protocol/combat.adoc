@@ -78,6 +78,26 @@ A message with the state `combat` contains informations about a combat context.
 
 == Messages
 
+[[msg-combat-ask]]
+=== `combat:ask`
+
+****
+icon:envelope[] `CLIENT-ONLY`
+****
+
+This message is sent by the client to notify the server the player wants to
+fight with another player
+
+Request fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `opponent`   | `Integer`   | *(required)* Opponent ID.
+
+|===
+
+
 [[msg-combat-available]]
 === `combat:available`
 
