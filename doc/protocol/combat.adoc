@@ -179,7 +179,7 @@ NOTE: TODO: Describe all environments
 ----
 {
     "type": "combat:start",
-    "id": 1,
+    "combat_id": 1,
     "user": {
         "monster": {
             "id": 1,
@@ -204,7 +204,7 @@ NOTE: TODO: Describe all environments
             "name": "Kennie McCormick"
         }
     },
-    "type": "duel",
+    "combat_type": "duel",
     "env": "city",
     "first": true
 }
