@@ -64,22 +64,37 @@ pub fn run(ctx: Context, conn: TcpStream) {
 
     debug!("Got connection!");
 
-    match conn.try_clone() {
+    let read_handle = match conn.try_clone() {
         Ok(mut conn) => {
-            mioco::spawn(move || read_and_decode(&mut conn));
-        },
+            mioco::spawn(move || read_and_decode(&mut conn))
+        }
         Err(err) => {
             debug!("Error when trying to clone TcpStream connection : {}", err);
-        },
-    }
+            return;
+        }
+    };
 
-    match conn.try_clone() {
+    let event_handle = match conn.try_clone() {
         Ok(mut conn) => {
-            mioco::spawn(move || event::send_random_combat(&mut conn));
-        },
+            mioco::spawn(move || event::send_random_combat(&mut conn))
+        }
         Err(err) => {
             debug!("Error when trying to clone TcpStream connection : {}", err);
-        },
+            return;
+        }
+    };
+
+    read_handle.join().unwrap();
+    event_handle.join().unwrap();
+
+    match conn.session {
+        Some(mut session) => {
+            let db_conn = conn.ctx.db.get_connection().unwrap();
+            let ref user = session.user.get_or_fetch(&db_conn).unwrap().expect("No user?");
+            let mut users = conn.ctx.users.lock().unwrap_or_else(|e| e.into_inner());
+            users.remove(&(user.id as u32));
+        }
+        None => {}
     }
 }
 
