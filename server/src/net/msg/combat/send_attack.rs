@@ -9,6 +9,7 @@ pub struct SendAttack {
     pub header: MessageHeader,
     pub target: u32,
     pub attack: u32,
+    pub combat: u32,
 }
 
 impl MessagePart for SendAttack {
@@ -17,6 +18,7 @@ impl MessagePart for SendAttack {
             header: try!(MessageHeader::decode(data)),
             target: try!(fields::get(data, "target")),
             attack: try!(fields::get(data, "attack")),
+            combat: try!(fields::get(data, "combat")),
         })
 
     }
@@ -26,6 +28,7 @@ impl MessagePart for SendAttack {
         self.header.encode(data);
         data.set("target", &self.target);
         data.set("attack", &self.attack);
+        data.set ("combat", self.combat);
     }
 }
 
