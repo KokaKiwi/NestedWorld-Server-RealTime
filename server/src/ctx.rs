@@ -1,12 +1,16 @@
 //! Describe the internal context of the whole server, containing all global values and links to
 //! the server components.
 use Config;
+use combat::store::CombatStore;
 use db::Database;
+use mioco::sync::Mutex;
+use std::sync::Arc;
 
 #[derive(Clone)]
 pub struct Context {
     pub config: Config,
     pub db: Database,
+    pub combats: Arc<Mutex<CombatStore>>,
 }
 
 impl Context {
@@ -15,7 +19,8 @@ impl Context {
 
         Ok(Context {
             config: config,
-            db: db,
+            db: db.clone(),
+            combats: CombatStore::new(db.clone()),
         })
     }
 }
