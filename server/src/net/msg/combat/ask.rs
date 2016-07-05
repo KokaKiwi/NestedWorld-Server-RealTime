@@ -8,7 +8,7 @@ pub use super::data::user::User;
 #[derive(Debug, Clone, PartialEq)]
 pub struct Ask {
     pub header: MessageHeader,
-    pub opponent: u32,
+    pub opponent: String,
 }
 
 impl MessagePart for Ask {
