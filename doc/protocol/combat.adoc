@@ -60,10 +60,9 @@ A message with the state `combat` contains informations about a combat context.
 .Fields
 [cols="15,20,65"]
 |===
-| Field name | Field type | Description
+| Field name  | Field type | Description
 
-| `id`       | `integer`  | *(required)* User ID
-| `name`     | `string`   | *(required)* User name (`pseudo`)
+| `pseudo`    | `string`   | *(required)* User pseudo.
 
 |===
 
@@ -71,8 +70,7 @@ A message with the state `combat` contains informations about a combat context.
 [source,json]
 ----
 {
-    "id": 5,
-    "name": "KokaKiwi"
+    "pseudo": "KokaKiwi"
 }
 ----
 
@@ -91,9 +89,9 @@ fight with another player
 Request fields
 [cols="15,20,65"]
 |===
-| Field name | Field type | Description
+| Field name  | Field type | Description
 
-| `opponent`   | `Integer`   | *(required)* Opponent ID.
+| `opponent`  | `string`   | *(required)* Opponent pseudo.
 
 |===
 
@@ -220,8 +218,7 @@ NOTE: TODO: Describe all environments
         },
         "monsters_count": 6,
         "user": {
-            "id": 2,
-            "name": "Kennie McCormick"
+            "pseudo": "Kennie McCormick"
         }
     },
     "combat_type": "duel",
