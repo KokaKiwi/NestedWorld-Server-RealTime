@@ -47,7 +47,7 @@ pub fn send_random_combat(conn: &mut Connection) {
           ResultData::Success(ref data) => {
               //start_combat(data);
           },
-          ResultData::Error { kind, message, data } => {
+          ResultData::Error { .. } => {
               continue;
           }
         }
