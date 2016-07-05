@@ -1,4 +1,5 @@
 #![allow(dead_code, unused_variables)]
+use mioco::tcp::TcpStream;
 use self::state::State;
 
 pub mod store;
@@ -134,6 +135,7 @@ pub struct Player {
 pub enum PlayerData {
     User {
         user: ::db::models::user::User,
+        stream: TcpStream,
     },
     AI,
 }
