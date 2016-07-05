@@ -11,6 +11,7 @@ pub struct AttackReceived {
     pub attack: u32,
     pub monster: Monster,
     pub target: Monster,
+    pub combat: u32,
 }
 
 impl MessagePart for AttackReceived {
@@ -20,6 +21,7 @@ impl MessagePart for AttackReceived {
             attack: try!(fields::get(data, "attack")),
             monster: try!(fields::get(data, "monster")),
             target: try!(fields::get(data, "target")),
+            combat: try!(fields::get(data, "combat")),
         })
 
     }
@@ -30,6 +32,7 @@ impl MessagePart for AttackReceived {
         data.set("attack", &self.attack);
         data.set("monster", self.monster.value());
         data.set("target", self.target.value());
+        data.set("combat", self.combat)
     }
 }
 
