@@ -93,7 +93,7 @@ Request fields
 |===
 | Field name | Field type | Description
 
-| `opponent`   | `combat:User`   | *(required)* Informations about opponent's side.
+| `opponent`   | `Integer`   | *(required)* Opponent ID.
 
 |===
 
