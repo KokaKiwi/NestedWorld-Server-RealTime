@@ -4,7 +4,7 @@ use net::msg::error::Result;
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
-use super::{MessagePart, MessageHeader};
+use super::{MessagePart, MessageFull, MessageHeader};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Authenticate {
@@ -34,6 +34,16 @@ impl MessagePart for Authenticate {
         data.set("type", "authenticate");
         self.header.encode(data);
         data.set("token", &self.token);
+    }
+}
+
+impl MessageFull for Authenticate {
+    fn header(&self) -> &MessageHeader {
+        &self.header
+    }
+
+    fn header_mut(&mut self) -> &mut MessageHeader {
+        &mut self.header
     }
 }
 

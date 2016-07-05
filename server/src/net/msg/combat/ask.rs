@@ -3,34 +3,30 @@ use net::msg::error::{Result};
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
-pub use super::data::end::stats::Stats;
+pub use super::data::user::User;
 
 #[derive(Debug, Clone, PartialEq)]
-pub struct End {
+pub struct Ask {
     pub header: MessageHeader,
-    pub status: String,
-    pub stats: Stats,
+    pub opponent: u32,
 }
 
-impl MessagePart for End {
-    fn decode(data: &Value) -> Result<End> {
-        Ok(End {
+impl MessagePart for Ask {
+    fn decode(data: &Value) -> Result<Ask> {
+        Ok(Ask {
             header: try!(MessageHeader::decode(data)),
-            status: try!(fields::get(data, "status")),
-            stats: try!(fields::get(data, "stats")),
+            opponent: try!(fields::get(data, "opponent")),
         })
-
     }
 
     fn encode(&self, data: &mut Value) {
-        data.set("type", "combat:end");
+        data.set("type", "combat:ask");
         self.header.encode(data);
-        data.set("status", &self.status);
-        data.set("stats", self.stats.value());
+        data.set("opponent", &self.opponent);
     }
 }
 
-impl MessageFull for End {
+impl MessageFull for Ask {
     fn header(&self) -> &MessageHeader {
         &self.header
     }

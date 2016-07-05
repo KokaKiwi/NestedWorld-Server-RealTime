@@ -51,6 +51,30 @@ macro_rules! __message {
         __message!([ENCODE MESSAGE] $name ($self_, $data) ($($e)*) ($($r)* $variant_name,));
     };
 
+    ([MESSAGE HEADER] $name:ident ($self_:expr) () ($($variant_name:ident,)*)) => {
+        match $self_ {
+            $($name::$variant_name(ref msg) => msg.header(),)*
+        }
+    };
+    ([MESSAGE HEADER] $name:ident ($self_:expr) ($(#[$meta:meta])* type $($ty:expr),* => $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
+        __message!([MESSAGE HEADER] $name ($self_) ($($e)*) ($($r)* $variant_name,));
+    };
+    ([MESSAGE HEADER] $name:ident ($self_:expr) ($(#[$meta:meta])* ref $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
+        __message!([MESSAGE HEADER] $name ($self_) ($($e)*) ($($r)* $variant_name,));
+    };
+
+    ([MESSAGE HEADER MUT] $name:ident ($self_:expr) () ($($variant_name:ident,)*)) => {
+        match $self_ {
+            $($name::$variant_name(ref mut msg) => msg.header_mut(),)*
+        }
+    };
+    ([MESSAGE HEADER MUT] $name:ident ($self_:expr) ($(#[$meta:meta])* type $($ty:expr),* => $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
+        __message!([MESSAGE HEADER MUT] $name ($self_) ($($e)*) ($($r)* $variant_name,));
+    };
+    ([MESSAGE HEADER MUT] $name:ident ($self_:expr) ($(#[$meta:meta])* ref $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
+        __message!([MESSAGE HEADER MUT] $name ($self_) ($($e)*) ($($r)* $variant_name,));
+    };
+
     ([IMPL MESSAGE] $name:ident ($($e:tt)*)) => {
         impl $crate::net::msg::MessagePart for $name {
             fn decode(data: &$crate::rmp::Value) -> $crate::net::msg::error::Result<$name> {
@@ -64,6 +88,16 @@ macro_rules! __message {
                 __message!([ENCODE MESSAGE] $name (*self, data) ($($e)*) ());
             }
         }
+
+        impl $crate::net::msg::MessageFull for $name {
+            fn header(&self) -> &$crate::net::msg::MessageHeader {
+                __message!([MESSAGE HEADER] $name (*self) ($($e)*) ())
+            }
+
+            fn header_mut(&mut self) -> &mut $crate::net::msg::MessageHeader {
+                __message!([MESSAGE HEADER MUT] $name (*self) ($($e)*) ())
+            }
+         }
     };
 }
 

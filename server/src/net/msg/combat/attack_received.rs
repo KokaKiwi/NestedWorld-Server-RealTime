@@ -1,4 +1,4 @@
-use net::msg::{MessagePart, MessageHeader};
+use net::msg::{MessagePart, MessageFull, MessageHeader};
 use net::msg::error::{Result};
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
@@ -30,5 +30,15 @@ impl MessagePart for AttackReceived {
         data.set("attack", &self.attack);
         data.set("monster", self.monster.value());
         data.set("target", self.target.value());
+    }
+}
+
+impl MessageFull for AttackReceived {
+    fn header(&self) -> &MessageHeader {
+        &self.header
+    }
+
+    fn header_mut(&mut self) -> &mut MessageHeader {
+        &mut self.header
     }
 }

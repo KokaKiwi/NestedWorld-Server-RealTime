@@ -1,4 +1,4 @@
-use net::msg::{MessagePart, MessageHeader};
+use net::msg::{MessagePart, MessageFull, MessageHeader};
 use net::msg::error::Result;
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
@@ -22,5 +22,15 @@ impl MessagePart for JoinChannel {
         data.set("type", "chat:join-channel");
         self.header.encode(data);
         data.set("channel", &self.channel);
+    }
+}
+
+impl MessageFull for JoinChannel {
+    fn header(&self) -> &MessageHeader {
+        &self.header
+    }
+
+    fn header_mut(&mut self) -> &mut MessageHeader {
+        &mut self.header
     }
 }

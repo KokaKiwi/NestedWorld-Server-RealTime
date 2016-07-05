@@ -78,6 +78,26 @@ A message with the state `combat` contains informations about a combat context.
 
 == Messages
 
+[[msg-combat-ask]]
+=== `combat:ask`
+
+****
+icon:envelope[] `CLIENT-ONLY`
+****
+
+This message is sent by the client to notify the server the player wants to
+fight with another player
+
+Request fields
+[cols="15,20,65"]
+|===
+| Field name | Field type | Description
+
+| `opponent`   | `Integer`   | *(required)* Opponent ID.
+
+|===
+
+
 [[msg-combat-available]]
 === `combat:available`
 
@@ -119,9 +139,10 @@ and ask for confirmation to start it.
 .Response fields
 [cols="15,20,65"]
 |===
-| Field name   | Field type | Description
+| Field name   | Field type       | Description
 
-| `accept`     | `boolean`  | *(required)* If the user accept or no the combat request.
+| `accept`     | `boolean`        | *(required)* If the user accept or no the combat request.
+| `monsters`   | `array[integer]` | *(required if `accept` is true)* UserMonster IDs selected for the combat
 
 |===
 
@@ -135,16 +156,16 @@ icon:envelope[] `SERVER-ONLY`, `NO RESPONSED NEEDED`
 .Request fields
 [cols="15,20,65"]
 |===
-| Field name | Field type                                                   | Description
+| Field name    | Field type                                                   | Description
 
-| `id`       | `integer`                                                    | *(required)* Combat ID
-| `user`     | `<<msg-combat-start-struct-user,combat:start:User>>`         | *(required)* Informations about user's side.
-| `opponent` | `<<msg-combat-start-struct-opponent,combat:start:Opponent>>` | *(required)* Informations about opponent's side.
-| `type`     | `string`                                                     | *(required)* Combat type:
-                                                                              `wild`, `dungeon` or `duel`
-| `env`      | `string`                                                     | *(required)* Combat environment:
-                                                                              `city`, `dungeon`, `campaign`, `sea`, etc.
-| `first`    | `boolean`                                                    | *(required)* Is the user first to move?
+| `combat_id`   | `integer`                                                    | *(required)* Combat ID
+| `user`        | `<<msg-combat-start-struct-user,combat:start:User>>`         | *(required)* Informations about user's side.
+| `opponent`    | `<<msg-combat-start-struct-opponent,combat:start:Opponent>>` | *(required)* Informations about opponent's side.
+| `combat_type` | `string`                                                     | *(required)* Combat type:
+                                                                                 `wild`, `dungeon` or `duel`
+| `env`         | `string`                                                     | *(required)* Combat environment:
+                                                                                 `city`, `dungeon`, `campaign`, `sea`, etc.
+| `first`       | `boolean`                                                    | *(required)* Is the user first to move?
 
 |===
 
@@ -178,7 +199,7 @@ NOTE: TODO: Describe all environments
 ----
 {
     "type": "combat:start",
-    "id": 1,
+    "combat_id": 1,
     "user": {
         "monster": {
             "id": 1,
@@ -203,7 +224,7 @@ NOTE: TODO: Describe all environments
             "name": "Kennie McCormick"
         }
     },
-    "type": "duel",
+    "combat_type": "duel",
     "env": "city",
     "first": true
 }

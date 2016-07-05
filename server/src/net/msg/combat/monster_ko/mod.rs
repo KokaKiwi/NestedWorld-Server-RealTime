@@ -1,4 +1,4 @@
-use net::msg::{MessagePart, MessageHeader};
+use net::msg::{MessagePart, MessageFull, MessageHeader};
 use net::msg::error::{Result};
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
@@ -28,6 +28,16 @@ impl MessagePart for MonsterKo {
         data.set("type", "combat:monster-ko");
         self.header.encode(data);
         data.set("monster", &self.monster);
+    }
+}
+
+impl MessageFull for MonsterKo {
+    fn header(&self) -> &MessageHeader {
+        &self.header
+    }
+
+    fn header_mut(&mut self) -> &mut MessageHeader {
+        &mut self.header
     }
 }
 
