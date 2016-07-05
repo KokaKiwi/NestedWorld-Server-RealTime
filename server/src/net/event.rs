@@ -45,7 +45,7 @@ pub fn send_random_combat(conn: &mut Connection) {
 
         match msg.data {
           ResultData::Success(ref data) => {
-              //start_combat(data);
+              //start_pve_combat(conn, data);
           },
           ResultData::Error { kind, message, data } => {
               continue;

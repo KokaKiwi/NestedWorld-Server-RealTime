@@ -1,5 +1,5 @@
 use net::conn::Connection;
-use net::msg::combat::Ask;
+use net::msg::combat::Flee;
 use net::msg::result::ResultData;
 use net::handlers::helpers::result::handle_with_result;
 
