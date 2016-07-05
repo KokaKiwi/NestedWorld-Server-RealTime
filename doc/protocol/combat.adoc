@@ -85,7 +85,7 @@ A message with the state `combat` contains informations about a combat context.
 icon:envelope[] `CLIENT-ONLY`
 ****
 
-This message is sent by the server to notify the server the player wants to
+This message is sent by the client to notify the server the player wants to
 fight with another player
 
 Request fields
