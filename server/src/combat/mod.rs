@@ -86,8 +86,8 @@ impl Combat {
         &self.players
     }
 
-    pub fn add_player(&mut self, player: PlayerType, monsters: &[u32]) -> ::db::error::Result<Vec<u32>> {
-        Ok(Vec::new())
+    pub fn add_player(&mut self, player: PlayerData) -> Vec<u32> {
+        Vec::new()
     }
 
     pub fn start(&mut self) {
@@ -125,39 +125,25 @@ impl Monster {
     }
 }
 
-pub enum PlayerType {
-    User(u32),
+pub struct Player {
+    pub monsters: Vec<u32>,
+    pub current_monster: u32,
+    pub data: PlayerData,
+}
+
+pub enum PlayerData {
+    User {
+        user: ::db::models::user::User,
+    },
     AI,
 }
 
-pub struct Player {
-    pub ty: PlayerType,
-    pub monsters: Vec<u32>,
-    pub current_monster: u32,
-    pub user: Option<::db::models::user::User>,
-}
-
 impl Player {
-    pub fn new_user(db: &::db::Database, id: u32, monsters: &[u32]) -> ::db::error::Result<Option<Player>> {
-        let user = match try!(db.get_model(id as i32)) {
-            Some(user) => user,
-            None => return Ok(None),
-        };
-
-        Ok(Some(Player {
-            ty: PlayerType::User(id),
-            monsters: monsters.to_owned(),
-            current_monster: monsters[0],
-            user: Some(user),
-        }))
-    }
-
-    pub fn new_ai(monsters: &[u32]) -> Player {
+    pub fn new(data: PlayerData, monsters: &[u32]) -> Player {
         Player {
-            ty: PlayerType::AI,
             monsters: monsters.to_owned(),
             current_monster: monsters[0],
-            user: None,
+            data: data,
         }
     }
 }
