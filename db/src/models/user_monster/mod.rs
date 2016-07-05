@@ -6,12 +6,11 @@ use super::user::User;
 pub struct UserMonster {
     pub id: i32,
 
-    pub user_id: i32,
-    pub monster_id: i32,
-
     pub surname: String,
     pub experience: i32,
     pub level: i32,
+
+    pub hp: i32,
 
     pub user: Relation<User>,
     pub monster: Relation<Monster>,
@@ -20,7 +19,7 @@ pub struct UserMonster {
 impl Model for UserMonster {
     fn get_by_id(conn: &::postgres::Connection, id: i32) -> ::postgres::Result<Option<UserMonster>> {
         let query = r#"
-            SELECT user_id, monster_id, surname, experience, level, monster, user
+            SELECT user_id, monster_id, surname, experience, level
             FROM users_monsters
             WHERE id = $1
         "#;
@@ -29,15 +28,14 @@ impl Model for UserMonster {
             UserMonster {
                 id: id,
 
-                user_id: row.get("user_id"),
-                monster_id: row.get("monster_id"),
-
                 surname: row.get("suname"),
                 experience: row.get("experience"),
                 level: row.get("level"),
 
-                user: Relation::new(row.get("user")),
-                monster: Relation::new(row.get("monster")),
+                hp: row.get("hp"),
+
+                user: Relation::new(row.get("user_id")),
+                monster: Relation::new(row.get("monster_id")),
             }
         });
         Ok(user_monster)

@@ -10,7 +10,7 @@ pub mod state {
         #[doc(hidden)]
         __InvalidState__,
         WaitingPlayers,
-        Started,
+        WaitingAttack,
         MonsterKo(u32),
         Finished,
     }
@@ -44,7 +44,26 @@ pub mod state {
 
         pub fn start(&mut self) -> Option<State> {
             action!(self,
-                State::WaitingPlayers => State::Started
+                State::WaitingPlayers => State::WaitingAttack
+            )
+        }
+
+        pub fn monster_ko(&mut self, id: u32) -> Option<State> {
+            action!(self,
+                State::WaitingAttack => State::MonsterKo(id)
+            )
+        }
+
+        pub fn replace(&mut self) -> Option<State> {
+            action!(self,
+                State::MonsterKo(_) => State::WaitingAttack
+            )
+        }
+
+        pub fn finish(&mut self) -> Option<State> {
+            action!(self,
+                State::WaitingAttack => State::Finished,
+                State::MonsterKo(_) => State::Finished
             )
         }
     }
@@ -91,37 +110,55 @@ impl Combat {
         Vec::new()
     }
 
-    pub fn start(&mut self) {
+    pub fn start(&mut self) -> bool {
+        self.state.start().is_some()
     }
 
     pub fn attack(&mut self, player: u32, target: u32, attack: u32) {
+        let ref mut m_target = self.monsters[target as usize];
+
+        let damages = if self.players[m_target.player as usize].is_user() {
+            20
+        } else {
+            3
+        };
+
+        m_target.hp = m_target.hp.checked_sub(damages).unwrap_or(0);
+
+        if m_target.hp == 0 {
+            self.state.monster_ko(target);
+        }
     }
 
     pub fn flee(&mut self, player: u32) {
+        self.finish(None);
     }
 
     pub fn replace(&mut self, player: u32, monster: u32) {
     }
 
     pub fn finish(&mut self, winner: Option<u32>) {
+        self.state.finish();
     }
 }
 
 pub struct Monster {
     pub user_monster: ::db::models::user_monster::UserMonster,
     pub player: u32,
+    pub hp: u32,
 }
 
 impl Monster {
     pub fn load(db: &::db::Database, id: u32, player: u32) -> ::db::error::Result<Option<Monster>> {
-        let user_monster = match try!(db.get_model(id as i32)) {
+        let user_monster: ::db::models::user_monster::UserMonster = match try!(db.get_model(id as i32)) {
             Some(user_monster) => user_monster,
             None => return Ok(None),
         };
 
         Ok(Some(Monster {
-            user_monster: user_monster,
+            hp: user_monster.hp as u32,
             player: player,
+            user_monster: user_monster,
         }))
     }
 }
@@ -140,6 +177,22 @@ pub enum PlayerData {
     AI,
 }
 
+impl PlayerData {
+    pub fn is_user(&self) -> bool {
+        match *self {
+            PlayerData::User { .. } => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_ai(&self) -> bool {
+        match *self {
+            PlayerData::AI => true,
+            _ => false,
+        }
+     }
+}
+
 impl Player {
     pub fn new(data: PlayerData, monsters: &[u32]) -> Player {
         Player {
@@ -147,5 +200,13 @@ impl Player {
             current_monster: monsters[0],
             data: data,
         }
+    }
+
+    pub fn is_user(&self) -> bool {
+        self.data.is_user()
+    }
+
+    pub fn is_ai(&self) -> bool {
+        self.data.is_ai()
     }
 }
