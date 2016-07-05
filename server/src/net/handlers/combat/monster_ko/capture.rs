@@ -9,5 +9,5 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
             Some(_) => { return ResultData::ok(None)},
             None => { return ResultData::err("NotAuthenticated", "You are not authenticated on the server", None)}
         }
-    })
+    });
 }
