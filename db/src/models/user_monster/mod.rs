@@ -19,7 +19,7 @@ pub struct UserMonster {
 impl Model for UserMonster {
     fn get_by_id(conn: &::postgres::Connection, id: i32) -> ::postgres::Result<Option<UserMonster>> {
         let query = r#"
-            SELECT user_id, monster_id, surname, experience, level
+            SELECT user_id, monster_id, surname, experience, level, hp
             FROM user_monsters
             WHERE id = $1
         "#;
@@ -45,13 +45,13 @@ impl Model for UserMonster {
 impl UserMonster {
     pub fn insert(&self, conn: &::postgres::Connection) -> ::postgres::Result<()> {
         let query = r#"
-            INSERT INTO user_monsters (user_id, monster_id, surname, experience, level)
+            INSERT INTO user_monsters (user_id, monster_id, surname, experience, level, hp)
             VALUES
-                ($1, $2, $3, $4, $5)
+                ($1, $2, $3, $4, $5, $6)
         "#;
 
         try!(conn.execute(query, &[&self.user.id(), &self.monster.id(),
-                                   &self.surname, &self.experience, &self.level]));
+                                   &self.surname, &self.experience, &self.level, &self.hp]));
 
         Ok(())
     }
