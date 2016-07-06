@@ -20,10 +20,10 @@ pub struct Monster {
     pub id: i32,
     pub name: String,
     pub monster_type: MonsterType,
-    pub attack: f32,
-    pub hp: f32,
-    pub speed: f32,
-    pub defense: f32,
+    pub attack: f64,
+    pub hp: f64,
+    pub speed: f64,
+    pub defense: f64,
 }
 
 impl Model for Monster {
