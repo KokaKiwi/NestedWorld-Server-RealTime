@@ -2,8 +2,12 @@ use ctx::Context;
 use mioco;
 use mioco::tcp::TcpListener;
 
+macro_rules! mutex_lock {
+    ($expr:expr) => { $expr.lock().unwrap_or_else(|e| e.into_inner()) };
+}
+
 #[macro_use] pub mod msg;
-pub mod conn;
+#[macro_use] pub mod conn;
 pub mod handlers;
 pub mod event;
 

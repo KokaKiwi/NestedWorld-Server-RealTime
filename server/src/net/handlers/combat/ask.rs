@@ -10,8 +10,8 @@ use net::msg::utils::rmp::ValueExt;
 use net::handlers::helpers::result::send_result;
 
 pub fn handle(conn: &mut Connection, msg: Ask) {
-    let user = match conn.session {
-        Some(ref session) => session.user.get().unwrap().clone(),
+    let user = match conn.session() {
+        Some(session) => session.user.get().unwrap().clone(),
         None => {
             send_result(conn, &msg.header, ResultData::err("NotAuthenticated", "You are not authenticated on the server", None));
             return;

@@ -25,7 +25,7 @@ macro_rules! rmp_map {
         }
     };
     [$($key:expr => $value:expr),*,] => {
-        rmp_map[$($key => $value),*]
+        rmp_map![$($key => $value),*]
     };
 }
 

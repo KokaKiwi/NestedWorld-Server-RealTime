@@ -1,4 +1,4 @@
-#![feature(pub_restricted, specialization)]
+#![feature(pub_restricted, specialization, trace_macros)]
 
 extern crate jwt;
 #[macro_use] extern crate log;

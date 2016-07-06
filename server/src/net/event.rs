@@ -28,7 +28,7 @@ fn start_combat(conn: &mut Connection) {
     let header = MessageHeader::new();
     let db_conn = conn.ctx.db.get_connection().unwrap();
 
-    let user = match conn.session {
+    let user = match conn.session() {
         Some(ref session) => session.user.get().unwrap().clone(),
         None => return,
     };

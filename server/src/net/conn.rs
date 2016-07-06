@@ -2,19 +2,20 @@ use ctx::Context;
 use db::models::token::Session;
 use mioco;
 use mioco::sync::mpsc as chan;
+use mioco::sync::Mutex;
 use mioco::tcp::TcpStream;
 use super::msg::{Message, MessagePart, MessageFull};
 use rmp::decode::value::read_value;
 use rmp::encode::value::Error as EncodeError;
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use super::handlers;
 use super::event;
 
 pub struct Connection {
     pub ctx: Context,
     pub stream: TcpStream,
-    pub session: Option<Session>,
+    pub session: Arc<Mutex<Option<Session>>>,
     conversations: Arc<Mutex<HashMap<String, chan::Sender<Message>>>>,
 }
 
@@ -23,7 +24,7 @@ impl Connection {
         Connection {
             ctx: ctx,
             stream: stream,
-            session: None,
+            session: Arc::new(Mutex::new(None)),
             conversations: Arc::new(Mutex::new(HashMap::new())),
         }
     }
@@ -55,10 +56,14 @@ impl Connection {
     }
 
     pub fn name(&self) -> String {
-        match self.session {
-            Some(ref session) => session.user.get().unwrap().pseudo.clone(),
+        match self.session() {
+            Some(session) => session.user.get().unwrap().pseudo.clone(),
             None => self.stream.peer_addr().unwrap().to_string(),
         }
+    }
+
+    pub fn session(&self) -> Option<Session> {
+        mutex_lock!(self.session).clone()
     }
 
     pub fn try_clone(&self) -> ::std::io::Result<Connection> {
@@ -99,7 +104,7 @@ pub fn run(ctx: Context, conn: TcpStream) {
     read_handle.join().unwrap();
     event_handle.join().unwrap();
 
-    match conn.session {
+    match conn.session() {
         Some(mut session) => {
             let db_conn = conn.ctx.db.get_connection().unwrap();
             let ref user = session.user.get_or_fetch(&db_conn).unwrap().expect("No user?");

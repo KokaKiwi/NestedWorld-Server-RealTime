@@ -9,8 +9,8 @@ use net::handlers::helpers::result::send_result;
 use rmp::encode::value::write_value;
 
 pub fn handle(conn: &mut Connection, msg: SendAttack) {
-    let session = match conn.session {
-        Some(ref session) => session.clone(),
+    let session = match conn.session() {
+        Some(session) => session.clone(),
         None => {
             send_result(conn, &msg.header, ResultData::err("NotAuthenticated", "You are not authenticated on the server", None));
             return;

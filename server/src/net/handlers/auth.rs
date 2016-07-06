@@ -30,7 +30,10 @@ pub fn handle(conn: &mut Connection, msg: Authenticate) {
             }
         }
 
-        conn.session = Some(session);
+        {
+            let mut session_lock = mutex_lock!(conn.session);
+            *session_lock = Some(session);
+        }
         ResultData::ok(None)
     });
 }

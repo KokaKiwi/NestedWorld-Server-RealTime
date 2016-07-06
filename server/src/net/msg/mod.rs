@@ -1,6 +1,5 @@
 use rmp::Value;
 use self::error::Result;
-use self::utils::fields;
 use self::utils::rmp::{FromValue, ValueExt};
 pub use self::auth::Authenticate;
 pub use self::result::ResultMessage;
@@ -62,7 +61,7 @@ impl MessageHeader {
 impl MessagePart for MessageHeader {
     fn decode(data: &Value) -> Result<MessageHeader> {
         Ok(MessageHeader {
-            id: try!(fields::get(data, "id")),
+            id: data.get("id"),
         })
     }
 
@@ -79,3 +78,30 @@ message!(Message {
     type "authenticate" => Authenticate(Authenticate),
     type "result" => Result(ResultMessage),
 });
+
+#[cfg(test)]
+mod test {
+    use super::{Message, MessagePart};
+
+    #[test]
+    fn test_decode_combat_ask() {
+        use super::combat::Ask;
+
+        let value = rmp_map![
+            "type" => "combat:ask",
+            "opponent" => "KokaKiwi",
+        ];
+        let msg = match Message::decode(&value) {
+            Ok(msg) => msg,
+            Err(e) => {
+                panic!("{}", e);
+            }
+        };
+        assert_eq!(msg, Message::Combat(super::combat::Message::Ask(Ask {
+            header: super::MessageHeader {
+                id: None,
+            },
+            opponent: "KokaKiwi".to_owned(),
+        })));
+    }
+}
