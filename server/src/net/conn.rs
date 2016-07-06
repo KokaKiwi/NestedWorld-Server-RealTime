@@ -30,11 +30,7 @@ impl Connection {
 
     pub fn send<M: MessagePart + ::std::fmt::Debug>(&mut self, msg: M) -> Result<(), EncodeError> {
         use rmp::encode::value::write_value;
-        let target = match self.session {
-            Some(ref session) => session.user.get().unwrap().pseudo.clone(),
-            None => self.stream.peer_addr().unwrap().to_string(),
-        };
-        debug!("[{}] <- {:?}", target, msg);
+        debug!("[{}] <- {:?}", self.name(), msg);
         write_value(&mut self.stream, &msg.value())
     }
 
@@ -56,6 +52,13 @@ impl Connection {
     pub fn get_conversation(&mut self, id: &str) -> Option<chan::Sender<Message>> {
         let mut conversations = self.conversations.lock().unwrap();
         conversations.remove(id)
+    }
+
+    pub fn name(&self) -> String {
+        match self.session {
+            Some(ref session) => session.user.get().unwrap().pseudo.clone(),
+            None => self.stream.peer_addr().unwrap().to_string(),
+        }
     }
 
     pub fn try_clone(&self) -> ::std::io::Result<Connection> {
@@ -127,11 +130,7 @@ pub fn read_and_decode(conn: &mut Connection) {
             }
         };
 
-        let source = match conn.session {
-            Some(ref session) => session.user.get().unwrap().pseudo.clone(),
-            None => conn.stream.peer_addr().unwrap().to_string(),
-        };
-        debug!("[{}] -> {:?}", source, msg);
+        debug!("[{}] -> {:?}", conn.name(), msg);
 
         handlers::handle(conn, msg);
     }

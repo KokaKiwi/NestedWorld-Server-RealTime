@@ -15,7 +15,8 @@ pub fn send_random_combat(conn: &mut Connection) {
     let between = Range::new(0, 140);
 
     loop {
-        let time = ::std::time::Duration::from_millis(120 + between.ind_sample(&mut rng));
+        let time = ::std::time::Duration::from_secs(120 + between.ind_sample(&mut rng));
+        debug!("[{}] Sleeping {:?}", conn.name(), time);
         ::mioco::sleep(time);
 
         let mut conn = conn.try_clone().unwrap();
