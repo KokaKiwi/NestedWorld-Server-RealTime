@@ -25,6 +25,7 @@ pub fn handle(conn: &mut Connection, msg: Ask) {
             return;
         }
     };
+    drop(db_conn);
     let mut opponent_conn = {
         let users = conn.ctx.users.lock().unwrap_or_else(|e| e.into_inner());
         users[&(opponent.id as u32)].try_clone().unwrap()
@@ -43,7 +44,7 @@ pub fn handle(conn: &mut Connection, msg: Ask) {
                 },
             },
         };
-        let user_rx = conn.send_request(avail).unwrap();
+        let user_rx = handler_try!(conn.send_request(avail));
 
         // Send to opponent
         let avail = Available {
@@ -54,7 +55,7 @@ pub fn handle(conn: &mut Connection, msg: Ask) {
                 },
             },
         };
-        let opponent_rx = opponent_conn.send_request(avail).unwrap();
+        let opponent_rx = handler_try!(opponent_conn.send_request(avail));
 
         let user_monsters: Vec<u32> = match user_rx.recv().unwrap() {
             Message::Result(::net::msg::ResultMessage {
@@ -67,6 +68,7 @@ pub fn handle(conn: &mut Connection, msg: Ask) {
         };
         let user_monsters: Vec<_> = user_monsters.into_iter()
             .map(|user_monster_id| {
+                let db_conn = conn.ctx.db.get_connection().unwrap();
                 let mut entry: ::db::models::user_monster::UserMonster = conn.ctx.db.get_model(user_monster_id as i32).unwrap().unwrap();
                 entry.user.fetch(&db_conn).unwrap();
                 entry.monster.fetch(&db_conn).unwrap();
@@ -85,6 +87,7 @@ pub fn handle(conn: &mut Connection, msg: Ask) {
         };
         let opponent_monsters: Vec<_> = opponent_monsters.into_iter()
             .map(|user_monster_id| {
+                let db_conn = conn.ctx.db.get_connection().unwrap();
                 let mut entry: ::db::models::user_monster::UserMonster = conn.ctx.db.get_model(user_monster_id as i32).unwrap().unwrap();
                 entry.user.fetch(&db_conn).unwrap();
                 entry.monster.fetch(&db_conn).unwrap();

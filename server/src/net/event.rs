@@ -26,7 +26,6 @@ pub fn send_random_combat(conn: &mut Connection) {
 
 fn start_combat(conn: &mut Connection) {
     let header = MessageHeader::new();
-    let db_conn = conn.ctx.db.get_connection().unwrap();
 
     let user = match conn.session() {
         Some(ref session) => session.user.get().unwrap().clone(),
@@ -52,6 +51,7 @@ fn start_combat(conn: &mut Connection) {
     };
     let monsters: Vec<_> = monsters.into_iter()
         .map(|user_monster_id| {
+            let db_conn = conn.ctx.db.get_connection().unwrap();
             let mut entry: ::db::models::user_monster::UserMonster = conn.ctx.db.get_model(user_monster_id as i32).unwrap().unwrap();
             entry.user.fetch(&db_conn).unwrap();
             entry.monster.fetch(&db_conn).unwrap();
@@ -69,7 +69,10 @@ fn start_combat(conn: &mut Connection) {
         stream: conn.stream.try_clone().unwrap(),
     }, &monsters);
     let mut monster: Relation<::db::models::monster::Monster> = Relation::new(1);
-    let monster_name = monster.fetch(&db_conn).unwrap().unwrap().name.clone();
+    let monster_name = {
+        let db_conn = conn.ctx.db.get_connection().unwrap();
+        monster.fetch(&db_conn).unwrap().unwrap().name.clone()
+    };
     combat.add_player(PlayerData::AI, &[::db::models::user_monster::UserMonster {
         id: 0,
         surname: monster_name,
