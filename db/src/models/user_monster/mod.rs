@@ -20,7 +20,7 @@ impl Model for UserMonster {
     fn get_by_id(conn: &::postgres::Connection, id: i32) -> ::postgres::Result<Option<UserMonster>> {
         let query = r#"
             SELECT user_id, monster_id, surname, experience, level
-            FROM users_monsters
+            FROM user_monsters
             WHERE id = $1
         "#;
         let rows = try!(conn.query(query, &[&id]));
@@ -45,7 +45,7 @@ impl Model for UserMonster {
 impl UserMonster {
     pub fn insert(&self, conn: &::postgres::Connection) -> ::postgres::Result<()> {
         let query = r#"
-            INSERT INTO users_monsters (user_id, monster_id, surname, experience, level)
+            INSERT INTO user_monsters (user_id, monster_id, surname, experience, level)
             VALUES
                 ($1, $2, $3, $4, $5)
         "#;
