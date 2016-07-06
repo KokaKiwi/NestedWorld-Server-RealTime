@@ -26,9 +26,15 @@ pub fn handle(conn: &mut Connection, msg: Ask) {
         }
     };
     drop(db_conn);
-    let mut opponent_conn = {
+    let mut opponent_conn = match {
         let users = conn.ctx.users.lock().unwrap_or_else(|e| e.into_inner());
-        users[&(opponent.id as u32)].try_clone().unwrap()
+        users.get(&(opponent.id as u32)).map(|conn| conn.try_clone().unwrap())
+    } {
+        Some(conn) => conn,
+        None => {
+            send_result(conn, &msg.header, ResultData::err("InvalidUser", "User not connectd", None));
+            return;
+        }
     };
 
     send_result(conn, &msg.header, ResultData::ok(None));
