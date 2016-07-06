@@ -1,4 +1,4 @@
-use mioco::tcp::TcpStream;
+use net::conn::Connection;
 use std::collections::HashMap;
 
-pub type UserStore = HashMap<u32, TcpStream>;
+pub type UserStore = HashMap<u32, Connection>;

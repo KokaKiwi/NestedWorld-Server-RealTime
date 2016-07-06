@@ -22,8 +22,7 @@ impl CombatStore {
         })
     }
 
-    pub fn create<F>(&mut self) -> Arc<Mutex<Combat>>
-        where F: FnOnce(u32) -> Combat
+    pub fn create(&mut self) -> Arc<Mutex<Combat>>
     {
         if !self.entries.has_remaining() {
             self.entries.grow(16);

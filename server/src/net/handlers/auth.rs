@@ -25,8 +25,8 @@ pub fn handle(conn: &mut Connection, msg: Authenticate) {
             let ref user = session.user.get().unwrap();
             let mut users = conn.ctx.users.lock().unwrap_or_else(|e| e.into_inner());
 
-            if let Ok(stream) = conn.stream.try_clone() {
-                users.insert(user.id as u32, stream);
+            if let Ok(conn) = conn.try_clone() {
+                users.insert(user.id as u32, conn);
             }
         }
 

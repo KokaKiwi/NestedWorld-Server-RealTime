@@ -42,6 +42,14 @@ pub struct MessageHeader {
 }
 
 impl MessageHeader {
+    pub fn new() -> MessageHeader {
+        let mut header = MessageHeader {
+            id: None,
+        };
+        header.ensure_id();
+        header
+    }
+
     pub fn ensure_id(&mut self) -> String {
         use uuid::Uuid;
 

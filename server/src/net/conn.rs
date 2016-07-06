@@ -30,6 +30,12 @@ impl Connection {
 
     pub fn send<M: MessagePart>(&mut self, msg: M) -> Result<(), EncodeError> {
         use rmp::encode::value::write_value;
+        let value = msg.value();
+        let target = match self.session {
+            Some(ref session) => session.user.get().unwrap().pseudo.clone(),
+            None => self.stream.peer_addr().unwrap().to_string(),
+        };
+        debug!("[{}] {:?}", target, value);
         write_value(&mut self.stream, &msg.value())
     }
 
@@ -37,11 +43,15 @@ impl Connection {
         let id = msg.header_mut().ensure_id();
 
         self.send(msg).map(|_| {
-            let (tx, rx) = chan::channel();
-            let mut conversations = self.conversations.lock().unwrap();
-            conversations.insert(id, tx);
-            rx
+            self.register_request(id)
         })
+    }
+
+    pub fn register_request(&self, id: String) -> chan::Receiver<Message> {
+        let (tx, rx) = chan::channel();
+        let mut conversations = self.conversations.lock().unwrap_or_else(|e| e.into_inner());
+        conversations.insert(id, tx);
+        rx
     }
 
     pub fn get_conversation(&mut self, id: &str) -> Option<chan::Sender<Message>> {
@@ -117,6 +127,12 @@ pub fn read_and_decode(conn: &mut Connection) {
                 continue;
             }
         };
+
+        let source = match conn.session {
+            Some(ref session) => session.user.get().unwrap().pseudo.clone(),
+            None => conn.stream.peer_addr().unwrap().to_string(),
+        };
+        debug!("[{}] {:?}", source, msg);
 
         handlers::handle(conn, msg);
     }
