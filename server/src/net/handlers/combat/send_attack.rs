@@ -94,10 +94,7 @@ pub fn handle(conn: &mut Connection, msg: SendAttack) {
         };
         let ko_value = ko_msg.value();
 
-        let owner_id = combat.monsters()[msg.target as usize].player;
-
-        for player in combat.players().iter().enumerate()
-                            .filter_map(|(id, player)| if id as u32 != owner_id { Some(player) } else { None })
+        for player in combat.players()
         {
             match player.data {
                 PlayerData::User {
