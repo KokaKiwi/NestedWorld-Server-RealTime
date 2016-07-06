@@ -22,5 +22,5 @@ pub fn handle(conn: &mut Connection, msg: Ask) {
             },
             None => { return ResultData::err("NotAuthenticated", "You are not authenticated on the server", None)}
         }
-    })
+    });
 }

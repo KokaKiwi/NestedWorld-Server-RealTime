@@ -106,8 +106,23 @@ impl Combat {
         &self.players
     }
 
-    pub fn add_player(&mut self, player: PlayerData) -> Vec<u32> {
-        Vec::new()
+    pub fn add_player(&mut self, player: PlayerData, monsters: &[::db::models::user_monster::UserMonster]) -> Vec<u32> {
+        let player_id = self.players.len() as u32;
+        let monster_ids: Vec<u32> = (self.monsters.len() as u32..self.monsters.len() as u32 + monsters.len() as u32).collect();
+
+        for monster in monsters {
+            let monster = Monster {
+                user_monster: monster.clone(),
+                player: player_id,
+                hp: monster.monster.get().unwrap().hp as u32,
+            };
+            self.monsters.push(monster);
+        }
+
+        let player = Player::new(player, &monster_ids);
+        self.players.push(player);
+
+        monster_ids
     }
 
     pub fn start(&mut self) -> bool {
