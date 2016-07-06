@@ -9,10 +9,12 @@ use rmp::decode::value::read_value;
 use rmp::encode::value::Error as EncodeError;
 use std::collections::HashMap;
 use std::sync::Arc;
+use std::sync::atomic::AtomicBool;
 use super::handlers;
 use super::event;
 
 pub struct Connection {
+    open: Arc<AtomicBool>,
     pub ctx: Context,
     pub stream: TcpStream,
     pub session: Arc<Mutex<Option<Session>>>,
@@ -22,6 +24,7 @@ pub struct Connection {
 impl Connection {
     pub fn new(ctx: Context, stream: TcpStream) -> Connection {
         Connection {
+            open: Arc::new(AtomicBool::new(true)),
             ctx: ctx,
             stream: stream,
             session: Arc::new(Mutex::new(None)),
@@ -66,12 +69,23 @@ impl Connection {
         mutex_lock!(self.session).clone()
     }
 
+    pub fn open(&self) -> bool {
+        use std::sync::atomic::Ordering;
+        self.open.load(Ordering::SeqCst)
+    }
+
+    pub fn close(&self) {
+        use std::sync::atomic::Ordering;
+        self.open.store(false, Ordering::SeqCst);
+    }
+
     pub fn try_clone(&self) -> ::std::io::Result<Connection> {
         Ok(Connection {
-          ctx: self.ctx.clone(),
-          stream: try!(self.stream.try_clone()),
-          session: self.session.clone(),
-          conversations: self.conversations.clone(),
+            open: self.open.clone(),
+            ctx: self.ctx.clone(),
+            stream: try!(self.stream.try_clone()),
+            session: self.session.clone(),
+            conversations: self.conversations.clone(),
         })
     }
 }
@@ -91,7 +105,7 @@ pub fn run(ctx: Context, conn: TcpStream) {
         }
     };
 
-    let event_handle = match conn.try_clone() {
+    let _event_handle = match conn.try_clone() {
         Ok(mut conn) => {
             mioco::spawn(move || event::send_random_combat(&mut conn))
         }
@@ -102,7 +116,6 @@ pub fn run(ctx: Context, conn: TcpStream) {
     };
 
     read_handle.join().unwrap();
-    event_handle.join().unwrap();
 
     match conn.session() {
         Some(mut session) => {
@@ -113,6 +126,7 @@ pub fn run(ctx: Context, conn: TcpStream) {
         }
         None => {}
     }
+    conn.close();
 }
 
 pub fn read_and_decode(conn: &mut Connection) {

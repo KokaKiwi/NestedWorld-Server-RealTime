@@ -14,7 +14,7 @@ pub fn send_random_combat(conn: &mut Connection) {
     let mut rng = rand::thread_rng();
     let between = Range::new(0, 60);
 
-    loop {
+    while conn.open() {
         let time = ::std::time::Duration::from_secs(60 + between.ind_sample(&mut rng));
         debug!("[{}] Sleeping {:?}", conn.name(), time);
         ::mioco::sleep(time);
@@ -38,7 +38,10 @@ fn start_combat(conn: &mut Connection) {
             monster_id: 1,
         },
     };
-    let rx = conn.send_request(avail).unwrap();
+    let rx = match conn.send_request(avail) {
+        Ok(rx) => rx,
+        _ => return,
+    };
 
     let monsters: Vec<u32> = match rx.recv().unwrap() {
         Message::Result(::net::msg::ResultMessage {
