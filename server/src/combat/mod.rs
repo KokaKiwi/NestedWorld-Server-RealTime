@@ -106,7 +106,7 @@ impl Combat {
         &self.players
     }
 
-    pub fn add_player(&mut self, player: PlayerData) -> Vec<u32> {
+    pub fn add_player(&mut self, player: PlayerData, monsters: &[::db::models::user_monster::UserMonster]) -> Vec<u32> {
         Vec::new()
     }
 
