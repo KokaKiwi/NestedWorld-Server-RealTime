@@ -14,7 +14,7 @@ pub fn handle_with_result<F>(conn: &mut Connection, header: &MessageHeader, f: F
     };
 
     match conn.send(msg) {
-        Ok(_) => true
+        Ok(_) => true,
         Err(e) => {
             debug!("Error when sending result: {}", e);
             false
