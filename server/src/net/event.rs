@@ -18,7 +18,8 @@ pub fn send_random_combat(conn: &mut Connection) {
         let time = ::std::time::Duration::from_millis(120 + between.ind_sample(&mut rng));
         ::mioco::sleep(time);
 
-        start_combat(conn);
+        let mut conn = conn.try_clone().unwrap();
+        ::mioco::spawn(move || start_combat(&mut conn));
     }
 }
 
