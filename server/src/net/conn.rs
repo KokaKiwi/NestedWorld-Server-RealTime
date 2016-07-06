@@ -136,21 +136,19 @@ pub fn read_and_decode(conn: &mut Connection) {
             Err(e) => {
                 // Error during reading value, we just handle this silently by closing the
                 // connection.
-                debug!("Error reading MessagePack value: {}", e);
+                debug!("[{}] Error reading MessagePack value: {}", conn.name(), e);
                 break;
             }
         };
-
         debug!("[{}] -RAW-> {:?}", conn.name(), msg);
 
         let msg = match Message::decode(&msg) {
             Ok(msg) => msg,
             Err(e) => {
-                debug!("Received an invalid message: {}", e);
+                debug!("[{}] Received an invalid message: {}", conn.name(), e);
                 continue;
             }
         };
-
         debug!("[{}] -> {:?}", conn.name(), msg);
 
         handlers::handle(conn, msg);

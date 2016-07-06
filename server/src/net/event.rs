@@ -81,7 +81,6 @@ fn start_combat(conn: &mut Connection) {
         surname: monster_name,
         experience: 50,
         level: 2,
-        hp: 60,
         user: Relation::new(0),
         monster: monster.clone(),
     }]);

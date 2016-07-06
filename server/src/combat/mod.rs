@@ -163,21 +163,6 @@ pub struct Monster {
     pub hp: u32,
 }
 
-impl Monster {
-    pub fn load(db: &::db::Database, id: u32, player: u32) -> ::db::error::Result<Option<Monster>> {
-        let user_monster: ::db::models::user_monster::UserMonster = match try!(db.get_model(id as i32)) {
-            Some(user_monster) => user_monster,
-            None => return Ok(None),
-        };
-
-        Ok(Some(Monster {
-            hp: user_monster.hp as u32,
-            player: player,
-            user_monster: user_monster,
-        }))
-    }
-}
-
 pub struct Player {
     pub monsters: Vec<u32>,
     pub current_monster: u32,
