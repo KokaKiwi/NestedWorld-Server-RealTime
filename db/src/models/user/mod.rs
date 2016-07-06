@@ -59,7 +59,7 @@ impl User {
 impl Model for User {
     fn get_by_id(conn: &::postgres::Connection, id: i32) -> ::postgres::Result<Option<User>> {
         let query = r#"
-            SELECT email, registered_at, is_active, pseudo, city, birth_date, gender, avatar, background
+            SELECT registered_at, is_active, pseudo, city, birth_date, gender, avatar, background
             FROM users
             WHERE id = $1
         "#;
