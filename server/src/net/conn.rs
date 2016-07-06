@@ -115,7 +115,7 @@ pub fn run(ctx: Context, conn: TcpStream) {
         }
     };
 
-    read_handle.join().unwrap();
+    let _ read_handle.join();
 
     match conn.session() {
         Some(mut session) => {
