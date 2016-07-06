@@ -94,60 +94,24 @@ pub fn handle(conn: &mut Connection, msg: SendAttack) {
         };
         let ko_value = ko_msg.value();
 
-        let owner_id = combat.monsters()[msg.target as usize].player;
-
-        let mut is_ai = false;
-
-        for player in combat.players() {
-            if player.data.is_ai() {
-                is_ai = true;
-            }
-        }
-
-        if is_ai == true {
-            for player in combat.players().iter().enumerate()
-                                .filter_map(|(id, player)| if id as u32 == owner_id { Some(player) } else { None })
-            {
-                match player.data {
-                    PlayerData::User {
-                        ref stream,
-                        ..
-                    } => {
-                        if let Ok(mut stream) = stream.try_clone() {
-                            let _ = write_value(&mut stream, &ko_value);
-                        }
+        for player in combat.players()
+        {
+            match player.data {
+                PlayerData::User {
+                    ref stream,
+                    ..
+                } => {
+                    if let Ok(mut stream) = stream.try_clone() {
+                        let _ = write_value(&mut stream, &ko_value);
                     }
-                    _ => {}
                 }
+                _ => {}
             }
-
-            let mut conn = handler_try!(conn.try_clone());
-            ::mioco::spawn(move || {
-                let rx = conn.send_request(ko_msg).unwrap();
-            });
         }
 
-        else {
-            for player in combat.players().iter().enumerate()
-                                .filter_map(|(id, player)| if id as u32 != owner_id { Some(player) } else { None })
-            {
-                match player.data {
-                    PlayerData::User {
-                        ref stream,
-                        ..
-                    } => {
-                        if let Ok(mut stream) = stream.try_clone() {
-                            let _ = write_value(&mut stream, &ko_value);
-                        }
-                    }
-                    _ => {}
-                }
-            }
-
-            let mut conn = handler_try!(conn.try_clone());
-            ::mioco::spawn(move || {
-                let rx = conn.send_request(ko_msg).unwrap();
-            });
-        }
+        let mut conn = handler_try!(conn.try_clone());
+        ::mioco::spawn(move || {
+            let rx = conn.send_request(ko_msg).unwrap();
+        });
     }
 }
