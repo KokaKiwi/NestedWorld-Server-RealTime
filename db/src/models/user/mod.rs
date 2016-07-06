@@ -31,7 +31,7 @@ pub struct User {
 impl User {
     pub fn get_by_pseudo(conn: &::postgres::Connection, pseudo: &str) -> ::postgres::Result<Option<User>> {
         let query = r#"
-            SELECT id, registered_at, is_active, pseudo, city, birth_date, gender, avatar, background
+            SELECT id, email, registered_at, is_active, pseudo, city, birth_date, gender, avatar, background
             FROM users
             WHERE pseudo = $1
         "#;
@@ -59,7 +59,7 @@ impl User {
 impl Model for User {
     fn get_by_id(conn: &::postgres::Connection, id: i32) -> ::postgres::Result<Option<User>> {
         let query = r#"
-            SELECT registered_at, is_active, pseudo, city, birth_date, gender, avatar, background
+            SELECT email, registered_at, is_active, pseudo, city, birth_date, gender, avatar, background
             FROM users
             WHERE id = $1
         "#;
