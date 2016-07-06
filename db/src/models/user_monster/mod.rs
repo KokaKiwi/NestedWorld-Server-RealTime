@@ -28,7 +28,7 @@ impl Model for UserMonster {
             UserMonster {
                 id: id,
 
-                surname: row.get("suname"),
+                surname: row.get("surname"),
                 experience: row.get("experience"),
                 level: row.get("level"),
 
