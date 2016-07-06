@@ -127,6 +127,8 @@ pub fn read_and_decode(conn: &mut Connection) {
             }
         };
 
+        debug!("[{}] -RAW-> {:?}", conn.name(), msg);
+
         let msg = match Message::decode(&msg) {
             Ok(msg) => msg,
             Err(e) => {
