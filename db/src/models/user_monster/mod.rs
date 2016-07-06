@@ -41,3 +41,18 @@ impl Model for UserMonster {
         Ok(user_monster)
     }
 }
+
+impl UserMonster {
+    pub fn insert(&self, conn: &::postgres::Connection) -> ::postgres::Result<()> {
+        let query = r#"
+            INSERT INTO users_monsters (user_id, monster_id, surname, experience, level)
+            VALUES
+                ($1, $2, $3, $4, $5)
+        "#;
+
+        try!(conn.execute(query, &[&self.user.id(), &self.monster.id(),
+                                   &self.surname, &self.experience, &self.level]));
+
+        Ok(())
+    }
+}
