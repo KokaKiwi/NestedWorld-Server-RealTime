@@ -12,10 +12,10 @@ use super::conn::Connection;
 
 pub fn send_random_combat(conn: &mut Connection) {
     let mut rng = rand::thread_rng();
-    let between = Range::new(0, 140);
+    let between = Range::new(0, 60);
 
     loop {
-        let time = ::std::time::Duration::from_secs(120 + between.ind_sample(&mut rng));
+        let time = ::std::time::Duration::from_secs(60 + between.ind_sample(&mut rng));
         debug!("[{}] Sleeping {:?}", conn.name(), time);
         ::mioco::sleep(time);
 

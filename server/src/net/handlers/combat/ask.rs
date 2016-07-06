@@ -50,7 +50,7 @@ pub fn handle(conn: &mut Connection, msg: Ask) {
             header: msg.header.clone(),
             origin: Origin::Duel {
                 user: ::net::msg::combat::data::User {
-                    pseudo: opponent.pseudo.clone(),
+                    pseudo: user.pseudo.clone(),
                 },
             },
         };
