@@ -50,6 +50,24 @@ pub fn handle(conn: &mut Connection, msg: SendAttack) {
     combat.attack(player_id, msg.target, msg.attack);
     combat.attack(msg.target, monster, msg.attack);
 
+    let ref player = combat.players()[player_id as usize];
+    let ref attacker = combat.monsters()[msg.target as usize];
+    let ref attackee = combat.monsters()[player.current_monster as usize];
+    let ia_msg = ::net::msg::combat::AttackReceived {
+        header: msg.header.clone(),
+        combat: msg.combat,
+        attack: msg.attack,
+        monster: ::net::msg::combat::data::attack_received::Monster {
+            id: msg.target,
+            hp: attacker.hp as u16,
+        },
+        target: ::net::msg::combat::data::attack_received::Monster {
+            id: player.current_monster,
+            hp: attackee.hp as u16,
+        },
+    };
+    conn.send_request(ia_msg).unwrap();
+
     if !send_result(conn, &msg.header, ResultData::ok(None)) {
         return;
     }
@@ -82,25 +100,7 @@ pub fn handle(conn: &mut Connection, msg: SendAttack) {
                         let _ = write_value(&mut stream, &ar_value);
                     }
                 }
-                PlayerData::AI => {
-
-                    let ref player = combat.players()[player_id as usize];
-                    let ref attacker = combat.monsters()[msg.target as usize];
-                    let ref attackee = combat.monsters()[player.current_monster as usize];
-                    let ia_msg = ::net::msg::combat::AttackReceived {
-                        header: msg.header.clone(),
-                        combat: msg.combat,
-                        attack: msg.attack,
-                        monster: ::net::msg::combat::data::attack_received::Monster {
-                            id: msg.target,
-                            hp: attacker.hp as u16,
-                        },
-                        target: ::net::msg::combat::data::attack_received::Monster {
-                            id: player.current_monster,
-                            hp: attackee.hp as u16,
-                        },
-                    };
-                    conn.send_request(ia_msg).unwrap();
+                _ => {
                 }
             }
         }
