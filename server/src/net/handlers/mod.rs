@@ -8,6 +8,7 @@ mod combat;
 pub fn handle(conn: &mut Connection, msg: Message) {
     let conversation = msg.header().id.as_ref().and_then(|id| conn.get_conversation(id));
     if let Some(tx) = conversation {
+        debug!("--^ REPLY ^--");
         match tx.send(msg) {
             Ok(_) => {}
             Err(e) => {

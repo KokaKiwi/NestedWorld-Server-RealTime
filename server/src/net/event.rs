@@ -48,9 +48,15 @@ fn start_combat(conn: &mut Connection) {
             data: ResultData::Success(ref data),
             ..
         }) => {
+            if !data.get("accept").unwrap_or(false) {
+                return;
+            }
             data.get("monsters").unwrap()
         }
-        _ => return,
+        msg => {
+            debug!("[{}] FAIL: {:?}", conn.name(), msg);
+            return;
+        }
     };
     let monsters: Vec<_> = monsters.into_iter()
         .map(|user_monster_id| {
