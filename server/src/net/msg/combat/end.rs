@@ -10,6 +10,7 @@ pub struct End {
     pub header: MessageHeader,
     pub status: String,
     pub stats: Stats,
+    pub combat: u32,
 }
 
 impl MessagePart for End {
@@ -18,6 +19,7 @@ impl MessagePart for End {
             header: try!(MessageHeader::decode(data)),
             status: try!(fields::get(data, "status")),
             stats: try!(fields::get(data, "stats")),
+            combat: try!(fields::get(data, "combat")),
         })
 
     }
@@ -27,6 +29,7 @@ impl MessagePart for End {
         self.header.encode(data);
         data.set("status", &self.status);
         data.set("stats", self.stats.value());
+        data.set ("combat", self.combat);
     }
 }
 
