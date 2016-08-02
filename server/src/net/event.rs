@@ -44,10 +44,10 @@ pub fn send_random_combat(conn: &mut Connection) {
         };
 
         match msg.data {
-          ResultData::Success(ref data) => {
+          ResultData::Success(ref _data) => {
               //start_combat(data);
           },
-          ResultData::Error { kind, message, data } => {
+          ResultData::Error { .. } => {
               continue;
           }
         }
