@@ -28,6 +28,34 @@ pub struct User {
     pub background: Option<String>,
 }
 
+impl User {
+    pub fn get_by_pseudo(conn: &::postgres::Connection, pseudo: &str) -> ::postgres::Result<Option<User>> {
+        let query = r#"
+            SELECT id, email, registered_at, is_active, pseudo, city, birth_date, gender, avatar, background
+            FROM users
+            WHERE pseudo = $1
+        "#;
+        let rows = try!(conn.query(query, &[&pseudo]));
+        let user = rows.iter().next().map(|row| {
+            User {
+                id: row.get("id"),
+
+                email: row.get("email"),
+                registered_at: row.get("registered_at"),
+                is_active: row.get("is_active"),
+
+                pseudo: row.get("pseudo"),
+                city: row.get("city"),
+                birth_date: row.get("birth_date"),
+                gender: row.get("gender"),
+                avatar: row.get("avatar"),
+                background: row.get("background"),
+            }
+        });
+        Ok(user)
+    }
+}
+
 impl Model for User {
     fn get_by_id(conn: &::postgres::Connection, id: i32) -> ::postgres::Result<Option<User>> {
         let query = r#"

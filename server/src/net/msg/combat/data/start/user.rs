@@ -1,5 +1,7 @@
 use net::msg::{MessagePart};
 use net::msg::error::Result;
+use net::msg::utils::fields;
+use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
 use super::super::monster::Monster;
 
@@ -11,11 +13,11 @@ pub struct User {
 impl MessagePart for User {
     fn decode(data: &Value) -> Result<User> {
         Ok(User {
-            monster: try!(Monster::decode(data)),
+            monster: try!(fields::get(data, "monster")),
         })
     }
 
     fn encode(&self, data: &mut Value) {
-        self.monster.encode(data);
+        data.set("monster", &self.monster.value());
     }
 }

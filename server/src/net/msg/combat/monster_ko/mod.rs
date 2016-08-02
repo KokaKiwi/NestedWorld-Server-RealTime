@@ -12,6 +12,7 @@ pub mod replace;
 #[derive(Debug, Clone, PartialEq)]
 pub struct MonsterKo {
     pub header: MessageHeader,
+    pub combat: u32,
     pub monster: u32,
 }
 
@@ -19,6 +20,7 @@ impl MessagePart for MonsterKo {
     fn decode(data: &Value) -> Result<MonsterKo> {
         Ok(MonsterKo {
             header: try!(MessageHeader::decode(data)),
+            combat: try!(fields::get(data, "combat")),
             monster: try!(fields::get(data, "monster")),
         })
 
@@ -27,6 +29,7 @@ impl MessagePart for MonsterKo {
     fn encode(&self, data: &mut Value) {
         data.set("type", "combat:monster-ko");
         self.header.encode(data);
+        data.set("combat", &self.combat);
         data.set("monster", &self.monster);
     }
 }

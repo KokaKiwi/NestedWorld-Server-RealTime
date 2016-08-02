@@ -21,7 +21,19 @@ pub fn handle(conn: &mut Connection, msg: Authenticate) {
             }
         };
 
-        conn.session = Some(session);
+        {
+            let ref user = session.user.get().unwrap();
+            let mut users = conn.ctx.users.lock().unwrap_or_else(|e| e.into_inner());
+
+            if let Ok(conn) = conn.try_clone() {
+                users.insert(user.id as u32, conn);
+            }
+        }
+
+        {
+            let mut session_lock = mutex_lock!(conn.session);
+            *session_lock = Some(session);
+        }
         ResultData::ok(None)
     });
 }

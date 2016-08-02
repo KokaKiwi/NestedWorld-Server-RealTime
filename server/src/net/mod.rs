@@ -2,10 +2,14 @@ use ctx::Context;
 use mioco;
 use mioco::tcp::TcpListener;
 
+macro_rules! mutex_lock {
+    ($expr:expr) => { $expr.lock().unwrap_or_else(|e| e.into_inner()) };
+}
+
 #[macro_use] pub mod msg;
-mod conn;
-mod handlers;
-mod event;
+#[macro_use] pub mod conn;
+pub mod handlers;
+pub mod event;
 
 pub(crate) fn run(ctx: Context) {
     let listener = TcpListener::bind(&ctx.config.listen_addr).unwrap();
