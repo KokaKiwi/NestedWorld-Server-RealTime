@@ -7,11 +7,11 @@ authors = ["KokaKiwi <kokakiwi@kokakiwi.net>"]
 clippy = { version = "*", optional = true }
 jwt = "0.4.0"
 log = "0.3.5"
-mioco = "0.7.0"
+mioco = "0.8.0"
 nestedworld-db = { path = "../db" }
 quick-error = "1.0.0"
 rand = "0.3"
 rmp = "^0.7"
 rustc-serialize = "^0.3"
 slab = "0.2"
-uuid = { version = "0.2", features = ["use_std", "v4"] }
+uuid = { version = "0.3", features = ["use_std", "v4"] }
