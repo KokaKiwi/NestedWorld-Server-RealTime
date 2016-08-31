@@ -1,15 +1,14 @@
 #![feature(plugin, custom_derive)]
 #![plugin(postgres_derive_macros)]
-
+#![recursion_limit = "1024"]
 extern crate chrono;
+#[macro_use] extern crate error_chain;
 #[macro_use] extern crate log;
 #[macro_use] extern crate postgres;
-#[macro_use] extern crate quick_error;
 extern crate r2d2;
 extern crate r2d2_postgres;
 extern crate serde_json;
 
-use error::Result;
 use models::utils::Model;
 use r2d2::{Pool, PooledConnection};
 use r2d2_postgres::PostgresConnectionManager;
@@ -31,13 +30,15 @@ pub struct Database {
 }
 
 impl Database {
-    pub fn connect(db_config: Config) -> Result<Database> {
+    pub fn connect(db_config: Config) -> error::Result<Database> {
         use r2d2::Config as PoolConfig;
         use r2d2_postgres::SslMode;
 
         let pool_config = PoolConfig::default();
-        let manager = try!(PostgresConnectionManager::new(db_config.url.as_str(), SslMode::None));
-        let pool = try!(Pool::new(pool_config, manager));
+        let manager = try!(PostgresConnectionManager::new(db_config.url.as_str(), SslMode::None)
+                            .map_err(error::postgres::Error::from));
+        let pool = try!(Pool::new(pool_config, manager)
+                            .map_err(error::pool::Error::from));
 
         Ok(Database {
             _config: db_config,
@@ -45,12 +46,12 @@ impl Database {
         })
     }
 
-    pub fn get_connection(&self) -> Result<Connection> {
-        self.pool.get().map_err(From::from)
+    pub fn get_connection(&self) -> error::Result<Connection> {
+        self.pool.get().map_err(error::pool::Error::from).map_err(From::from)
     }
 
-    pub fn get_model<T: Model>(&self, id: i32) -> Result<Option<T>> {
+    pub fn get_model<T: Model>(&self, id: i32) -> error::Result<Option<T>> {
         let conn = try!(self.get_connection());
-        T::get_by_id(&conn, id).map_err(From::from)
+        T::get_by_id(&conn, id).map_err(error::postgres::Error::from).map_err(From::from)
     }
 }

@@ -18,7 +18,7 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn create(config: Config) -> Result<Context, Error> {
+    pub fn create(config: Config) -> self::error::Result<Context> {
         let db = try!(Database::connect(config.db.clone()));
 
         Ok(Context {
@@ -30,14 +30,10 @@ impl Context {
     }
 }
 
-quick_error! {
-    #[derive(Debug)]
-    pub enum Error {
-        Database(err: ::db::error::Error) {
-            cause(err)
-            description(err.description())
-            display("Database error: {}", err)
-            from()
+pub mod error {
+    error_chain! {
+        links {
+            ::db::error::Error, ::db::error::ErrorKind, Database;
         }
     }
 }

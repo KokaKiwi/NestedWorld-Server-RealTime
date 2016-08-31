@@ -57,7 +57,7 @@ impl SessionData {
         let mut session = try!(db.get_model::<Session>(self.session_id as i32));
         if let Some(ref mut session) = session {
             let conn = try!(db.get_connection());
-            try!(session.user.fetch(&conn));
+            try!(session.user.fetch(&conn).map_err(::db::error::postgres::Error::from));
         }
         Ok(session)
     }

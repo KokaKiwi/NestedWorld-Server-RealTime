@@ -1,10 +1,10 @@
 #![feature(pub_restricted, specialization)]
-
+#![recursion_limit = "1024"]
+#[macro_use] extern crate error_chain;
 extern crate jwt;
 #[macro_use] extern crate log;
 extern crate mioco;
 pub extern crate nestedworld_db as db;
-#[macro_use] extern crate quick_error;
 extern crate rand;
 extern crate rmp;
 extern crate rustc_serialize;
