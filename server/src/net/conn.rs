@@ -8,10 +8,14 @@ use super::msg::{Message, MessagePart, MessageFull};
 use rmp::decode::value::read_value;
 use rmp::encode::value::Error as EncodeError;
 use std::collections::HashMap;
+use std::error::Error;
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 use super::handlers;
 use super::event;
+use net::msg::MessageHeader;
+use net::msg::result::ResultData;
+use net::handlers::helpers::result::send_result;
 
 pub struct Connection {
     open: Arc<AtomicBool>,
@@ -146,6 +150,7 @@ pub fn read_and_decode(conn: &mut Connection) {
             Ok(msg) => msg,
             Err(e) => {
                 debug!("[{}] Received an invalid message: {}", conn.name(), e);
+                send_result(conn, &MessageHeader::new(), ResultData::err("InvalidMsg", e.description(), None));
                 continue;
             }
         };
