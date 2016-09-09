@@ -1,5 +1,5 @@
 use super::{MessagePart, MessageFull, MessageHeader};
-use super::error::{Result, Error};
+use super::error::{Result, ErrorKind};
 use super::utils::fields;
 use super::utils::rmp::ValueExt;
 use rmp::Value;
@@ -64,7 +64,7 @@ impl MessagePart for ResultMessage {
                     data: data,
                 }
             }
-            _ => return Err(Error::InvalidField("result", format!("Bad result type `{}`, should be `success` or `error`", result))),
+            _ => return Err(ErrorKind::InvalidField("result", format!("Bad result type `{}`, should be `success` or `error`", result)).into()),
         };
 
         Ok(ResultMessage {
