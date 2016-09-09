@@ -1,6 +1,7 @@
 #![feature(pub_restricted, specialization)]
 #![recursion_limit = "1024"]
 #[macro_use] extern crate error_chain;
+extern crate futures;
 extern crate jwt;
 #[macro_use] extern crate log;
 extern crate mioco;
@@ -16,7 +17,6 @@ use mioco::JoinHandle;
 use std::net::SocketAddr;
 
 #[macro_use] pub mod net;
-pub mod combat;
 mod ctx;
 
 #[derive(Debug, Clone)]
