@@ -1,5 +1,5 @@
 use net::msg::{MessagePart, MessageFull, MessageHeader};
-use net::msg::error::{Result, Error};
+use net::msg::error::{Result, ErrorKind};
 use net::msg::utils::fields;
 use net::msg::utils::rmp::ValueExt;
 use rmp::Value;
@@ -41,7 +41,7 @@ impl MessagePart for Available {
                     user: user,
                 }
             }
-            _ => return Err(Error::InvalidField("origin", format!("Bad origin type `{}`, should be `wild_monster` or `duel`", origin)))
+            _ => return Err(ErrorKind::InvalidField("origin", format!("Bad origin type `{}`, should be `wild_monster` or `duel`", origin)).into())
         };
 
         Ok(Available {

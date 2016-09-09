@@ -1,8 +1,5 @@
-pub type Result<T> = ::std::result::Result<T, Error>;
-
-quick_error! {
-    #[derive(Debug)]
-    pub enum Error {
+error_chain! {
+    errors {
         MissingField(path: &'static str) {
             description("Missing message field")
             display("Missing message field: {}", path)

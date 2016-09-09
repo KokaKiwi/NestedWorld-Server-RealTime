@@ -1,7 +1,7 @@
 use super::conn::Connection;
 use super::msg::{MessageFull, Message};
 
-#[macro_use] mod helpers;
+#[macro_use] pub mod helpers;
 mod auth;
 mod combat;
 

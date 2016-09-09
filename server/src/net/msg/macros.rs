@@ -29,7 +29,7 @@ macro_rules! __message {
     ([DECODE TEST TYPES] $name:ident ($data:expr, $msg_type:expr) () ($(($($ty:expr),*) => $variant_name:ident,)*)) => {{
         match $msg_type {
             $($($ty)|* => $crate::net::msg::MessagePart::decode($data).map($name::$variant_name),)*
-            _ => Err($crate::net::msg::error::Error::InvalidField("type", format!("Unknown message type `{}`", $msg_type))),
+            _ => Err($crate::net::msg::error::ErrorKind::InvalidField("type", format!("Unknown message type `{}`", $msg_type)).into()),
         }
     }};
     ([DECODE TEST TYPES] $name:ident ($data:expr, $msg_type:expr) ($(#[$meta:meta])* type $($ty:expr),* => $variant_name:ident($msg_ty:ty), $($e:tt)*) ($($r:tt)*)) => {
