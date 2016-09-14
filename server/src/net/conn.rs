@@ -58,7 +58,7 @@ impl Connection {
     }
 
     pub fn get_conversation(&mut self, id: &str) -> Option<chan::Sender<Message>> {
-        let mut conversations = self.conversations.lock().unwrap();
+        let mut conversations = self.conversations.lock().unwrap_or_else(|e| e.into_inner());
         conversations.remove(id)
     }
 
@@ -138,8 +138,7 @@ pub fn read_and_decode(conn: &mut Connection) {
         let msg = match read_value(&mut conn.stream) {
             Ok(msg) => msg,
             Err(e) => {
-                // Error during reading value, we just handle this silently by closing the
-                // connection.
+                send_result(conn, &MessageHeader::new(), ResultData::err("internal", e.description(), None));
                 debug!("[{}] Error reading MessagePack value: {}", conn.name(), e);
                 break;
             }
