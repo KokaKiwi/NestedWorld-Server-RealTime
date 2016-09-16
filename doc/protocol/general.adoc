@@ -50,3 +50,23 @@ WARNING: When successful, this message add the state `<<state-authenticated,auth
     "token": "mt11MwyHz0wO2Kz0nQlcl6T4hmWGzTkk"
 }
 ----
+
+== Errors
+
+[[error-internal]]
+=== `internal`
+
+****
+icon:envelope[] `SERVER-ONLY`
+****
+
+This message is send by the server to say that an internal server error occured.
+
+[[error-invalid-msg]]
+=== `invalid-msg`
+
+****
+icon:envelope[] `SERVER-ONLY`
+****
+
+This message is send by the server to say that the last message recieved was not correctly formatted.

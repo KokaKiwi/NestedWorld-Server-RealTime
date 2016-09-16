@@ -8,10 +8,14 @@ use super::msg::{Message, MessagePart, MessageFull};
 use rmp::decode::value::read_value;
 use rmp::encode::value::Error as EncodeError;
 use std::collections::HashMap;
+use std::error::Error;
 use std::sync::Arc;
 use std::sync::atomic::AtomicBool;
 use super::handlers;
 use super::event;
+use net::msg::MessageHeader;
+use net::msg::result::ResultData;
+use net::handlers::helpers::result::send_result;
 
 pub struct Connection {
     open: Arc<AtomicBool>,
@@ -54,7 +58,7 @@ impl Connection {
     }
 
     pub fn get_conversation(&mut self, id: &str) -> Option<chan::Sender<Message>> {
-        let mut conversations = self.conversations.lock().unwrap();
+        let mut conversations = self.conversations.lock().unwrap_or_else(|e| e.into_inner());
         conversations.remove(id)
     }
 
@@ -134,8 +138,7 @@ pub fn read_and_decode(conn: &mut Connection) {
         let msg = match read_value(&mut conn.stream) {
             Ok(msg) => msg,
             Err(e) => {
-                // Error during reading value, we just handle this silently by closing the
-                // connection.
+                send_result(conn, &MessageHeader::new(), ResultData::err("internal", e.description(), None));
                 debug!("[{}] Error reading MessagePack value: {}", conn.name(), e);
                 break;
             }
@@ -146,6 +149,7 @@ pub fn read_and_decode(conn: &mut Connection) {
             Ok(msg) => msg,
             Err(e) => {
                 debug!("[{}] Received an invalid message: {}", conn.name(), e);
+                send_result(conn, &MessageHeader::new(), ResultData::err("InvalidMsg", e.description(), None));
                 continue;
             }
         };
