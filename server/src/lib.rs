@@ -17,7 +17,7 @@ use mioco::JoinHandle;
 use std::net::SocketAddr;
 
 #[macro_use] pub mod net;
-mod ctx;
+pub mod ctx;
 
 #[derive(Debug, Clone)]
 pub struct Config {

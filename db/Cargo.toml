@@ -6,10 +6,10 @@ authors = ["KokaKiwi <kokakiwi@kokakiwi.net>"]
 [dependencies]
 chrono = "0.2"
 clippy = { version = "*", optional = true }
-error-chain = "0.4"
+error-chain = "0.5"
 log = "0.3.5"
 postgres = { version = "0.11", features = ["chrono", "time", "uuid", "serde_json", "nightly"] }
-postgres-derive-macros = "0.1"
+postgres-derive-macros = { git = "https://github.com/KokaKiwi/rust-postgres-derive" }
 r2d2 = "0.7.0"
 r2d2_postgres = "0.10.0"
-serde_json = "0.7.1"
+serde_json = "0.8"
