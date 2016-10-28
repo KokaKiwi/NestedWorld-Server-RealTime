@@ -4,17 +4,11 @@ version = "0.1.0"
 authors = ["KokaKiwi <kokakiwi@kokakiwi.net>"]
 
 [dependencies]
+clap = { version = "2", features = ["nightly", "unstable"] }
 clippy = { version = "*", optional = true }
 error-chain = "0.4"
 log = "0.3.5"
+log4rs = { version = "0.4", features = ["toml"] }
 nestedworld-server = { path = "../server" }
 rustc-serialize = "0.3.18"
 toml-config = "0.3.0"
-
-[dependencies.clap]
-version = "^2.4"
-features = ["nightly", "unstable"]
-
-[dependencies.log4rs]
-version = "0.4.2"
-features = ["toml"]

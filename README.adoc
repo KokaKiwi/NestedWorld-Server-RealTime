@@ -2,7 +2,7 @@
 Guillaume HERVIER <guillaume.hervier@epitech.eu>; Aude LEJUEZ <aude.lejuez@epitech.eu>
 :toc: left
 :version: 0.1.0
-:rustversion: nightly-2016-09-16
+:rustversion: nightly-2016-10-28
 
 Protocol documentation: http://eip.kokakiwi.net/doc/protocol.html
 
@@ -27,3 +27,5 @@ You *must* use specific versions of libraries and compiler, in order to avoid br
 NOTE: If using git URL for a library, specify the commit!
 
 == Why not use stable Rust?
+
+Because some awesome Rust's features are only available in nightly builds.

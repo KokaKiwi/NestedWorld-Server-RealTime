@@ -1,10 +1,10 @@
-#![feature(plugin, custom_derive)]
-#![plugin(postgres_derive_macros)]
+#![feature(proc_macro)]
 #![recursion_limit = "1024"]
 extern crate chrono;
 #[macro_use] extern crate error_chain;
 #[macro_use] extern crate log;
 #[macro_use] extern crate postgres;
+#[macro_use] extern crate postgres_derive;
 extern crate r2d2;
 extern crate r2d2_postgres;
 extern crate serde_json;
@@ -32,10 +32,10 @@ pub struct Database {
 impl Database {
     pub fn connect(db_config: Config) -> error::Result<Database> {
         use r2d2::Config as PoolConfig;
-        use r2d2_postgres::SslMode;
+        use r2d2_postgres::TlsMode;
 
         let pool_config = PoolConfig::default();
-        let manager = try!(PostgresConnectionManager::new(db_config.url.as_str(), SslMode::None)
+        let manager = try!(PostgresConnectionManager::new(db_config.url.as_str(), TlsMode::None)
                             .map_err(error::postgres::Error::from));
         let pool = try!(Pool::new(pool_config, manager)
                             .map_err(error::pool::Error::from));
