@@ -12,7 +12,7 @@ notifications:
 - provider: Slack
   incoming_webhook:
     secure: 7LE83wr3JDkqk+J5mIqaQz4FQh/Lsu1QrXfsMa2/sfBSrniC0irDqlwTW/6gbUeSVvZeA4TmicSQ3oAyT3aNH1THM4unhZ0x9QJdZ/1OcVg=
-  channel: '#server'
+  channel: '#server-notifications'
 
 build: false
 
