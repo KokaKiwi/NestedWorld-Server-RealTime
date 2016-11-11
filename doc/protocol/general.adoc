@@ -2,6 +2,22 @@
 
 Here are described all the structures and messages global to the server.
 
+== Types
+
+[[type-date]]
+=== `date`
+
+*Base MessagePack type*: `string`
+
+A string formatted according to https://tools.ietf.org/html/rfc3339[RFC 3339] which represent a date where the time information is unused.
+
+[[type-datetime]]
+=== `datetime`
+
+*Base MessagePack type*: `string`
+
+A string formatted according to https://tools.ietf.org/html/rfc3339[RFC 3339] which represent a datetime.
+
 == States
 
 [[state-authenticated]]

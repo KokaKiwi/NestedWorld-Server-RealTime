@@ -1,6 +1,6 @@
 = Message format
 
-The protocol is composed of messages formatted as MessagePack footnote:[https://msgpack.org] objects.
+The protocol is composed of messages formatted as https://msgpack.org[MessagePack] objects.
 
 A message is MessagePack object containing message data in the fields.
 

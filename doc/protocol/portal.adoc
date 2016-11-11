@@ -1,0 +1,63 @@
+[[portals]]
+= Portals
+
+[[portal-messages]]
+== Messages
+
+[[msg-portal-capture]]
+=== `portal:capture`
+
+****
+icon:envelope[] `CLIENT-ONLY`
+
+icon:book[] `States: <<state-authenticated,authenticated>>`
+****
+
+This message is sent by the client to notify the server the player wants
+to capture a portal.
+
+The player send the informations of the monster he want to place in the portal
+in case the portal is free, or the one he wants to fight with in case the portal
+isn't.
+
+.Request fields
+[cols="15,20,65"]
+|===
+| Field name    | Field type    | Description
+
+| `portal_id`   | `integer`     | *(required)* The portal's ID used in the HTTP API
+| `monster`     | `integer`     | *(required)* UserMonster ID used in the HTTP API selected for the capture or combat
+
+|===
+
+.Result fields
+[cols="15,20,65"]
+|===
+| Field name    | Field type    | Description
+
+| `state`       | `string`      | *(required)* The state of this portal. +
+                                  See below for the possible values and the fields associated.
+
+|===
+
+.`vacant`
+[cols="15,20,65"]
+|===
+| Field name    | Field type    | Description
+
+|===
+
+.`occupied`
+[cols="15,20,65"]
+|===
+| Field name    | Field type                                    | Description
+
+| `owner`       | `<<struct-combat-user,combat:User>>`          | *(required)* The user who own the portal
+| `monster`     | `<<struct-combat-monster,combat:Monster>>`    | *(required)* The monster currently in the portal
+| `timeout`     | `<<type-datetime,datetime>>`                  | *(required)* The datetime at which the combat will start if the defender doesn't reply.
+
+|===
+
+.Errors
+* `InvalidPortal`: Generated when using an invalid portal ID
+* `InvalidMonster`: Generated when using an invalid monster ID

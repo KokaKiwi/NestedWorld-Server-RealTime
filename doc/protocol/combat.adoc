@@ -29,7 +29,7 @@ A message with the state `combat` contains informations about a combat context.
 |===
 | Field name        | Field type | Description
 
-| `id`              | `integer`  | *(required)* Monster ID
+| `id`              | `integer`  | *(required)* Monster ID specific for this combat
 | `name`            | `string`   | *(required)* Monster name
 | `monster_id`      | `integer`  | *(required)* Monster ID usable in the HTTP API
 | `user_monster_id` | `integer`  | *(optional)* UserMonster ID usable in the HTTP API +
@@ -62,6 +62,7 @@ A message with the state `combat` contains informations about a combat context.
 |===
 | Field name  | Field type | Description
 
+| `id`        | `integer`  | *(required)* User ID
 | `pseudo`    | `string`   | *(required)* User pseudo.
 
 |===
@@ -70,6 +71,7 @@ A message with the state `combat` contains informations about a combat context.
 [source,json]
 ----
 {
+    "id": 1,
     "pseudo": "KokaKiwi"
 }
 ----
@@ -86,7 +88,7 @@ icon:envelope[] `CLIENT-ONLY`
 This message is sent by the client to notify the server the player wants to
 fight with another player
 
-Request fields
+.Request fields
 [cols="15,20,65"]
 |===
 | Field name  | Field type | Description
@@ -134,6 +136,16 @@ and ask for confirmation to start it.
 
 |===
 
+.`portal`
+[cols="15,20,65"]
+|===
+| Field name    | Field type                            | Description
+
+| `user`        | `<<struct-combat-user,combat:User>>`  | *(required)* The user who attacked the portal
+| `timeout`     | `<<type-datetime,datetime>>`          | *(required)* The datetime at which the combat will start if the defender doesn't reply.
+
+|===
+
 .Response fields
 [cols="15,20,65"]
 |===
@@ -160,7 +172,7 @@ icon:envelope[] `SERVER-ONLY`, `NO RESPONSED NEEDED`
 | `user`        | `<<msg-combat-start-struct-user,combat:start:User>>`         | *(required)* Informations about user's side.
 | `opponent`    | `<<msg-combat-start-struct-opponent,combat:start:Opponent>>` | *(required)* Informations about opponent's side.
 | `combat_type` | `string`                                                     | *(required)* Combat type:
-                                                                                 `wild`, `dungeon` or `duel`
+                                                                                 `wild-monster`, `duel` or `portal`
 | `env`         | `string`                                                     | *(required)* Combat environment:
                                                                                  `city`, `dungeon`, `campaign`, `sea`, etc.
 | `first`       | `boolean`                                                    | *(required)* Is the user first to move?
@@ -183,12 +195,14 @@ NOTE: TODO: Describe all environments
 .`combat:start:Opponent`
 [cols="15,20,65"]
 |===
-| Field name       | Field type                                 | Description
+| Field name        | Field type                                    | Description
 
-| `monster`        | `<<struct-combat-monster,combat:Monster>>` | *(required)* Current monster. +
-                                                                  Does not have the `user_monster_id` field.
-| `monsters_count` | `integer`                                  | *(required)* Total number of monsters the opponent have.
-| `user`           | `<<struct-combat-user,combat:User>>`       | *(optional)* Opponent's owner, present if `type` is `duel`.
+| `monster`         | `<<struct-combat-monster,combat:Monster>>`    | *(required)* Current monster. +
+                                                                      Does not have the `user_monster_id` field.
+| `monsters_count`  | `integer`                                     | *(required)* Total number of monsters the opponent have.
+| `user`            | `<<struct-combat-user,combat:User>>`          | *(optional)* Opponent's owner, present if `combat_type` is `duel` or `portal`.
+| `defence`         | `boolean`                                     | *(optional)* In case the `combat_type` is `portal`, specify if the opponent
+                                                                      has accepted to defends the portal (or timed out).
 
 |===
 

@@ -2,7 +2,7 @@
 Aude Lejuez <aude.lejuez@epitech.eu>; Guillaume HERVIER <guillaume.hervier@epitech.eu>
 :toc: left
 :toclevels: 5
-:revnumber: 1.0.0
+:revnumber: 1.1.0
 :icons: font
 :idprefix:
 :idseparator: -
@@ -21,4 +21,4 @@ include::protocol/intro.adoc[leveloffset=+1]
 include::protocol/general.adoc[leveloffset=+1]
 include::protocol/chat.adoc[leveloffset=+1]
 include::protocol/combat.adoc[leveloffset=+1]
-include::protocol/geo.adoc[leveloffset=+1]
+include::protocol/portal.adoc[leveloffset=+1]
