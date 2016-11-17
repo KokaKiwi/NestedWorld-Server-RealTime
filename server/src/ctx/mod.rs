@@ -3,6 +3,7 @@
 use Config;
 use db::Database;
 use mioco::sync::Mutex;
+use self::error::*;
 use self::user::UserStore;
 use std::sync::Arc;
 
@@ -16,12 +17,12 @@ pub struct Context {
 }
 
 impl Context {
-    pub fn create(config: Config) -> self::error::Result<Context> {
+    pub fn create(config: Config) -> Result<Context> {
         let db = try!(Database::connect(config.db.clone()));
 
         Ok(Context {
             config: config,
-            db: db.clone(),
+            db: db,
             users: Arc::new(Mutex::new(UserStore::new())),
         })
     }
