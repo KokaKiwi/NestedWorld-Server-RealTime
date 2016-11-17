@@ -10,7 +10,9 @@ pub mod auth;
 pub mod chat;
 pub mod combat;
 pub mod error;
+pub mod portal;
 pub mod result;
+pub mod types;
 
 pub trait MessagePart: Sized {
     fn decode(data: &Value) -> Result<Self>;
@@ -75,6 +77,8 @@ message!(Message {
     ref Chat(self::chat::Message),
     #[doc = "Combat messages"]
     ref Combat(self::combat::Message),
+    #[doc = "Portal messages"]
+    ref Portal(self::portal::Message),
     type "authenticate" => Authenticate(Authenticate),
     type "result" => Result(ResultMessage),
 });

@@ -1,3 +1,4 @@
+use chrono::{Date, DateTime, UTC};
 use rmp::value::Value;
 use std::collections::HashMap;
 
@@ -122,6 +123,20 @@ impl<'a, K: FromValue<'a> + ::std::hash::Hash + Eq, V: FromValue<'a>> FromValue<
     fn from_value(value: &'a Value) -> Option<HashMap<K, V>> {
         use std::iter::FromIterator;
         Vec::<(K, V)>::from_value(value).map(FromIterator::from_iter)
+    }
+}
+
+impl<'a> FromValue<'a> for DateTime<UTC> {
+    fn from_value(value: &'a Value) -> Option<DateTime<UTC>> {
+        String::from_value(value)
+            .and_then(|s| s.parse().ok())
+    }
+}
+
+impl<'a> FromValue<'a> for Date<UTC> {
+    fn from_value(value: &'a Value) -> Option<Date<UTC>> {
+        DateTime::from_value(value)
+            .map(|dt| dt.date())
     }
 }
 

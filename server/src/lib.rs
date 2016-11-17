@@ -1,5 +1,6 @@
 #![feature(pub_restricted, specialization)]
 #![recursion_limit = "1024"]
+extern crate chrono;
 #[macro_use] extern crate error_chain;
 extern crate futures;
 extern crate jwt;
@@ -16,7 +17,9 @@ use ctx::Context;
 use mioco::JoinHandle;
 use std::net::SocketAddr;
 
+pub mod utils;
 #[macro_use] pub mod net;
+pub mod combat;
 pub mod ctx;
 
 #[derive(Debug, Clone)]

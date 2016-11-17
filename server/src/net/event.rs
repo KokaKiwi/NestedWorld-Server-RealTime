@@ -25,6 +25,7 @@ pub fn send_random_combat(conn: &mut Connection) {
             origin: Origin::WildMonster {
                 monster_id: 1,
             },
+            monsters_max_count: 3,
         };
 
         let rx = match conn.send_request(msg) {

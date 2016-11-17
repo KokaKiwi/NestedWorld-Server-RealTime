@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["KokaKiwi <kokakiwi@kokakiwi.net>"]
 
 [dependencies]
+chrono = "0.2.25"
 clippy = { version = "*", optional = true }
 error-chain = "0.5"
 futures = "0.1.3"

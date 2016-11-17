@@ -1,3 +1,4 @@
+use chrono::{Date, DateTime, UTC};
 use rmp::value::{Value, Integer, Float};
 use std::collections::HashMap;
 
@@ -83,6 +84,18 @@ impl<K: IntoValue + ::std::hash::Hash + Eq, V: IntoValue> IntoValue for HashMap<
         Value::Map(self.into_iter()
                        .map(|(key, value)| (key.into_value(), value.into_value()))
                        .collect())
+    }
+}
+
+impl IntoValue for DateTime<UTC> {
+    fn into_value(self) -> Value {
+        Value::String(self.to_rfc3339())
+    }
+}
+
+impl IntoValue for Date<UTC> {
+    fn into_value(self) -> Value {
+        Value::String(self.and_hms(0, 0, 0).to_rfc3339())
     }
 }
 
