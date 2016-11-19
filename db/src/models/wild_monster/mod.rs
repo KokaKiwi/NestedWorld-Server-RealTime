@@ -1,13 +1,9 @@
 use super::monster::MonsterType;
+use super::monster::Monster;
 
 pub struct WildMonster {
     pub level: u32,
-    pub name: String,
-    pub monster_type: MonsterType,
-    pub attack: f64,
-    pub hp: f64,
-    pub speed: f64,
-    pub defense: f64,
+    pub monster: Monster
 }
 
 impl WildMonster {
@@ -24,12 +20,15 @@ impl WildMonster {
         let monster = rows.iter().next().map(|row| {
             WildMonster {
                 level: level,
-                name: row.get("name"),
-                monster_type: row.get("type"),
-                attack: row.get("attack"),
-                hp: row.get("hp"),
-                speed: row.get("speed"),
-                defense: row.get("defense"),
+                monster: Monster {
+                    id: row.get("id"),
+                    name: row.get("name"),
+                    monster_type: row.get("type"),
+                    attack: row.get("attack"),
+                    hp: row.get("hp"),
+                    speed: row.get("speed"),
+                    defense: row.get("defense"),
+                }
             }
         });
         Ok(monster)
