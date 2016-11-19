@@ -4,3 +4,4 @@ pub mod user;
 pub mod monster;
 pub mod user_monster;
 pub mod attack;
+pub mod wild_monster;
