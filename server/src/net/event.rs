@@ -1,9 +1,11 @@
 use super::conn::Connection;
+use combat::prepare::prepare_wild_combat;
 use net::msg::combat::Available;
 use net::msg::combat::available::Origin;
 use net::msg::MessageHeader;
 use net::msg::Message;
 use net::msg::result::ResultData;
+use net::msg::utils::fields;
 use mioco;
 use std;
 use rand::distributions::{IndependentSample, Range};
@@ -46,8 +48,14 @@ pub fn send_random_combat(conn: &mut Connection) {
 
         match msg.data {
           ResultData::Success(ref _data) => {
-              //start_combat(data);
-          },
+              let result: bool = fields::get(_data, "accept").unwrap_or(false);
+              if result {
+                  let monsters: Vec<i32> = fields::get(_data, "monsters").unwrap_or(vec![]);
+                  if monsters.len() > 0 {
+                      prepare_wild_combat(conn, monsters);
+                  }
+              }
+          }
           ResultData::Error { .. } => {
               continue;
           }

@@ -7,7 +7,7 @@ pub struct WildMonster {
 }
 
 impl WildMonster {
-    fn generate(conn: &::postgres::Connection, level: u32) -> ::postgres::Result<Option<WildMonster>>{
+    pub fn generate(conn: &::postgres::Connection, level: u32) -> ::postgres::Result<Option<WildMonster>>{
 
         let query_random = r#"
             SELECT name, type, attack, hp, speed, defense
