@@ -63,9 +63,13 @@ impl Connection {
     }
 
     pub fn name(&self) -> String {
+        let peer_addr = self.stream.peer_addr().unwrap();
         match self.session() {
-            Some(session) => session.user.get().unwrap().pseudo.clone(),
-            None => self.stream.peer_addr().unwrap().to_string(),
+            Some(session) => {
+                let ref pseudo = session.user.get().unwrap().pseudo;
+                format!("{} ({})", pseudo, peer_addr)
+            }
+            None => peer_addr.to_string(),
         }
     }
 
