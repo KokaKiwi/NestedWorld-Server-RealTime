@@ -10,7 +10,6 @@ use mioco;
 use std;
 use rand::distributions::{IndependentSample, Range};
 use rand;
-use uuid::Uuid;
 
 pub fn send_random_combat(conn: &mut Connection) {
     let mut rng = rand::thread_rng();
@@ -21,9 +20,7 @@ pub fn send_random_combat(conn: &mut Connection) {
         mioco::sleep(time);
 
         let msg = Available {
-            header: MessageHeader {
-                id: Some(Uuid::new_v4().to_string()),
-            },
+            header: MessageHeader::new(),
             origin: Origin::WildMonster {
                 monster_id: 1,
             },
