@@ -15,10 +15,8 @@ pub struct Available {
 
 impl MessagePart for Available {
     fn decode(data: &Value) -> Result<Available> {
-        let header = try!(MessageHeader::decode(data));
-
         Ok(Available {
-            header: header,
+            header: try!(MessageHeader::decode(data)),
             origin: try!(Origin::decode(data)),
             monsters_max_count: try!(fields::get(data, "monsters_max_count")),
         })
