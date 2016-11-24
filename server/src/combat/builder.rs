@@ -11,10 +11,12 @@ mod db {
 pub struct CombatBuilder {
     pub user: User,
     pub opponent: Opponent,
+    pub ty: String,
+    pub env: String,
 }
 
 impl CombatBuilder {
-    pub fn new(user: UserInfos, opponent: OpponentType) -> CombatBuilder {
+    pub fn new(user: UserInfos, opponent: OpponentType, ty: &str, env: &str) -> CombatBuilder {
         CombatBuilder {
             user: User {
                 infos: user,
@@ -24,6 +26,8 @@ impl CombatBuilder {
                 ty: opponent,
                 monsters: Vec::new(),
             },
+            ty: ty.to_owned(),
+            env: env.to_owned(),
         }
     }
 
