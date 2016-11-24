@@ -7,17 +7,17 @@ mod db {
     pub use ::db::models::user_monster::UserMonster;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct CombatBuilder {
     pub user: User,
     pub opponent: Opponent,
 }
 
 impl CombatBuilder {
-    pub fn new(user: db::User, opponent: OpponentType) -> CombatBuilder {
+    pub fn new(user: UserInfos, opponent: OpponentType) -> CombatBuilder {
         CombatBuilder {
             user: User {
-                user: user,
+                infos: user,
                 monsters: Vec::new(),
             },
             opponent: Opponent {
@@ -43,31 +43,39 @@ impl CombatBuilder {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct User {
     pub infos: UserInfos,
     pub monsters: Vec<db::UserMonster>,
 }
 
-#[derive(Debug, Clone)]
 pub struct UserInfos {
     pub user: db::User,
     pub conn: Connection,
 }
 
-#[derive(Debug, Clone)]
+impl ::std::fmt::Debug for UserInfos {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        f.debug_struct("UserInfos")
+         .field("user", &self.user)
+         .field("conn", &self.conn.name())
+         .finish()
+    }
+}
+
+#[derive(Debug)]
 pub struct Opponent {
     pub ty: OpponentType,
     pub monsters: Vec<Monster>,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum OpponentType {
     AI,
     User(UserInfos),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Monster {
     pub monster: db::Monster,
     pub name: String,
