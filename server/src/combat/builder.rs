@@ -1,3 +1,6 @@
+use net::conn::Connection;
+use super::result::CombatResult;
+
 mod db {
     pub use ::db::models::monster::Monster;
     pub use ::db::models::user::User;
@@ -34,14 +37,22 @@ impl CombatBuilder {
         self
     }
 
-    pub fn start(self) {
+    pub fn start<F>(self, callback: F)
+        where F: Fn(CombatResult)
+    {
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct User {
-    pub user: db::User,
+    pub infos: UserInfos,
     pub monsters: Vec<db::UserMonster>,
+}
+
+#[derive(Debug, Clone)]
+pub struct UserInfos {
+    pub user: db::User,
+    pub conn: Connection,
 }
 
 #[derive(Debug, Clone)]
@@ -53,7 +64,7 @@ pub struct Opponent {
 #[derive(Debug, Clone)]
 pub enum OpponentType {
     AI,
-    User(u32),
+    User(UserInfos),
 }
 
 #[derive(Debug, Clone)]
