@@ -1,3 +1,4 @@
+use ctx::Context;
 use net::conn::Connection;
 use super::result::CombatResult;
 
@@ -31,17 +32,17 @@ impl CombatBuilder {
         }
     }
 
-    pub fn add_user_monster(&mut self, monster: &db::UserMonster) -> &mut Self {
+    pub fn add_user_monster(mut self, monster: &db::UserMonster) -> Self {
         self.user.monsters.push(monster.clone());
         self
     }
 
-    pub fn add_opponent_monster(&mut self, monster: Monster) -> &mut Self {
+    pub fn add_opponent_monster(mut self, monster: Monster) -> Self {
         self.opponent.monsters.push(monster);
         self
     }
 
-    pub fn start<F>(self, callback: F)
+    pub fn start<F>(self, ctx: &Context, callback: F)
         where F: Fn(CombatResult)
     {
     }
