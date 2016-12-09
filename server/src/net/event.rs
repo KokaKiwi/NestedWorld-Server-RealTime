@@ -1,4 +1,5 @@
 use super::conn::Connection;
+use db::models::wild_monster::WildMonster;
 use combat::prepare::prepare_wild_combat;
 use net::msg::combat::Available;
 use net::msg::combat::available::Origin;
@@ -19,10 +20,17 @@ pub fn send_random_combat(conn: &mut Connection) {
         let time =std::time::Duration::from_millis(120 + between.ind_sample(&mut rng));
         mioco::sleep(time);
 
+        let mut db_conn = conn.ctx.db.get_connection().unwrap();
+
+        let wild_monster = match WildMonster::generate(&mut db_conn) {
+            Ok(Some(monster)) => monster,
+            _ => return,
+        };
+
         let msg = Available {
             header: MessageHeader::new(),
             origin: Origin::WildMonster {
-                monster_id: 1,
+                monster_id: wild_monster.monster.id as u32
             },
             monsters_max_count: 3,
         };
@@ -49,7 +57,7 @@ pub fn send_random_combat(conn: &mut Connection) {
               if result {
                   let monsters: Vec<i32> = fields::get(_data, "monsters").unwrap_or(vec![]);
                   if monsters.len() > 0 {
-                      prepare_wild_combat(conn, monsters);
+                      prepare_wild_combat(conn, &monsters, wild_monster.monster.id);
                   }
               }
           }
