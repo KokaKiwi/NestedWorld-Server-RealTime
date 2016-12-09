@@ -31,7 +31,7 @@ impl Context {
 pub mod error {
     error_chain! {
         links {
-            ::db::error::Error, ::db::error::ErrorKind, Database;
+            Database(::db::error::Error, ::db::error::ErrorKind);
         }
     }
 }

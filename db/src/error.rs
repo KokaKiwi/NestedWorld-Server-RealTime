@@ -1,12 +1,12 @@
 //! Database errors definition.
 error_chain! {
     links {
-        self::postgres::Error, self::postgres::ErrorKind, Postgres;
-        self::pool::Error, self::pool::ErrorKind, Pool;
+        Postgres(self::postgres::Error, self::postgres::ErrorKind);
+        Pool(self::pool::Error, self::pool::ErrorKind);
     }
 
     foreign_links {
-        ::std::io::Error, Io;
+        Io(::std::io::Error);
     }
 
     errors {
@@ -17,8 +17,8 @@ pub mod postgres {
     error_chain! {
         links {}
         foreign_links {
-            ::postgres::error::ConnectError, Connect;
-            ::postgres::error::Error, Other;
+            Connect(::postgres::error::ConnectError);
+            Other(::postgres::error::Error);
         }
         errors {}
     }
@@ -39,8 +39,8 @@ pub mod pool {
     error_chain! {
         links {}
         foreign_links {
-            ::r2d2::InitializationError, Init;
-            ::r2d2::GetTimeout, Timeout;
+            Init(::r2d2::InitializationError);
+            Timeout(::r2d2::GetTimeout);
         }
         errors {}
     }
