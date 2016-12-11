@@ -6,9 +6,9 @@ use db::models::monster::Monster;
 use rand;
 use rand::distributions::{IndependentSample, Range};
 
-fn experience(win: bool, monster: &UserMonster, opponent: &User) -> i32 {
+pub fn experience(win: bool, average_lvl: u32) -> i32 {
     let multiplier = if win { 0.5 } else { 1.0 };
-    return ((monster.level * 2) as f32 * multiplier) as i32
+    return ((average_lvl * 2) as f32 * multiplier) as i32
 }
 
 fn attack(umonster: &UserMonster, monster: &Monster, attack: &Attack, damage: Option<u32>) -> u32 {
