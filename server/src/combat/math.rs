@@ -1,5 +1,4 @@
 use db::models::user_monster::UserMonster;
-use db::models::user::User;
 use db::models::attack::Attack;
 use db::models::attack::AttackType;
 use db::models::monster::Monster;
@@ -11,7 +10,7 @@ pub fn experience(win: bool, average_lvl: u32) -> i32 {
     return ((average_lvl * 2) as f32 * multiplier) as i32
 }
 
-fn attack(umonster: &UserMonster, monster: &Monster, attack: &Attack, damage: Option<u32>) -> u32 {
+pub fn attack(umonster: &UserMonster, monster: &Monster, attack: &Attack, damage: Option<u32>) -> u32 {
     let multiplier = match attack.attack_type {
      AttackType::Attack => 1.0,
      AttackType::Defense => 0.1,
