@@ -42,7 +42,7 @@ impl CombatBuilder {
     }
 
     pub fn start<F>(self, callback: F)
-        where F: Fn(CombatResult)
+        where F: FnOnce(CombatResult) + Send + 'static
     {
     }
 }
