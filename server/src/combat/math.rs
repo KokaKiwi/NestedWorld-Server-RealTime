@@ -1,5 +1,4 @@
 use db::models::user_monster::UserMonster;
-use db::models::user::User;
 use db::models::attack::Attack;
 use db::models::attack::AttackType;
 use db::models::monster::Monster;

@@ -1,3 +1,4 @@
+#![allow(unused_variables)] // TODO: Fix all associated warnings
 pub mod builder;
 pub mod end;
 pub mod math;

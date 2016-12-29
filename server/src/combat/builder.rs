@@ -41,8 +41,8 @@ impl CombatBuilder {
         self
     }
 
-    pub fn start<F>(&mut self, mut callback: F)
-        where F: FnMut(CombatResult)
+    pub fn start<F>(self, callback: F)
+        where F: FnOnce(CombatResult) + Send + 'static
     {
     }
 }

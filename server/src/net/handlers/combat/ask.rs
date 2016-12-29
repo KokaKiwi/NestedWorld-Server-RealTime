@@ -6,11 +6,8 @@ use net::msg::Message;
 use mioco::sync::mpsc::Receiver;
 use net::msg::result::ResultData;
 use net::msg::utils::rmp::ValueExt;
-use net::handlers::helpers::result::handle_with_result;
 use net::handlers::helpers::result::send_result;
 use db::models::user::User;
-use db::models::user_monster::UserMonster;
-use ctx::Context;
 use std::result;
 use combat::prepare::prepare_duel_combat;
 
@@ -21,7 +18,7 @@ pub fn find_connected_user(conn: &Connection, pseudo: &str) -> result::Result<Co
         _ => return Err(ResultData::err("InvalidUser", "No opponent named like that.", None)),
     };
     drop(db_conn);
-    let mut opponent_conn = match {
+    let opponent_conn = match {
         let users = conn.ctx.users.lock().unwrap_or_else(|e| e.into_inner());
         users.get(&(opponent.id as u32)).map(|conn| conn.try_clone().unwrap())
     } {
@@ -31,7 +28,7 @@ pub fn find_connected_user(conn: &Connection, pseudo: &str) -> result::Result<Co
     return Ok(opponent_conn);
 }
 
-pub fn get_combat_monsters(user_rx: Receiver<Message>, conn: &Connection) -> result::Result<Vec<i32>, bool> {
+pub fn get_combat_monsters(user_rx: Receiver<Message>, _conn: &Connection) -> result::Result<Vec<i32>, bool> {
     let user_monsters: Vec<i32> = match user_rx.recv().unwrap() {
         Message::Result(::net::msg::ResultMessage {
             data: ResultData::Success(ref data),
