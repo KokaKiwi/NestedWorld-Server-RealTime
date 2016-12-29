@@ -10,6 +10,7 @@ dependencies = [
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "mioco 0.8.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "nestedworld-db 0.1.0",
+ "postgis 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "rand 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
  "rmp 0.7.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "rustc-serialize 0.3.22 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -329,6 +330,7 @@ dependencies = [
  "clippy 0.0.103 (registry+https://github.com/rust-lang/crates.io-index)",
  "error-chain 0.7.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.3.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "postgis 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "postgres 0.13.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "postgres-derive 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "r2d2 0.7.1 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -440,6 +442,15 @@ dependencies = [
 name = "phf_shared"
 version = "0.7.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "postgis"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "byteorder 0.5.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "postgres 0.13.3 (registry+https://github.com/rust-lang/crates.io-index)",
+]
 
 [[package]]
 name = "postgres"
@@ -820,6 +831,7 @@ dependencies = [
 "checksum owning_ref 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "8d91377085359426407a287ab16884a0111ba473aa6844ff01d4ec20ce3d75e7"
 "checksum phf 0.7.20 (registry+https://github.com/rust-lang/crates.io-index)" = "0c6afb2057bb5f846a7b75703f90bc1cef4970c35209f712925db7768e999202"
 "checksum phf_shared 0.7.20 (registry+https://github.com/rust-lang/crates.io-index)" = "286385a0e50d4147bce15b2c19f0cf84c395b0e061aaf840898a7bf664c2cfb7"
+"checksum postgis 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)" = "4198ccd017ea5945be43a306ea12c265d6557eb3d12cdf3ecea2fd9081c24cef"
 "checksum postgres 0.13.3 (registry+https://github.com/rust-lang/crates.io-index)" = "04c6a463beab1af24d3c541bc876290bbdc42c91ef5ffb4f2010b428b0afcd73"
 "checksum postgres-derive 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "437e68a1567de3e549356296dc9f0a631d03e0ec257e8e7a97e37cc7a5983360"
 "checksum postgres-derive-internals 0.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d8215dac041e3ae1968ef87f94384724c8bac69b112d3751289e1965a05d6a5e"

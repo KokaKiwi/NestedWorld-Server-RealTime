@@ -1,25 +1,11 @@
 use super::utils::Model;
-
-#[derive(Debug, Clone, ToSql, FromSql)]
-#[postgres(name = "monster_type")]
-pub enum MonsterType {
-    #[postgres(name = "water")]
-    Water,
-    #[postgres(name = "fire")]
-    Fire,
-    #[postgres(name = "earth")]
-    Earth,
-    #[postgres(name = "electric")]
-    Electric,
-    #[postgres(name = "plant")]
-    Plant
-}
+use super::commons::ElementType;
 
 #[derive(Debug, Clone)]
 pub struct Monster {
     pub id: i32,
     pub name: String,
-    pub monster_type: MonsterType,
+    pub monster_type: ElementType,
     pub attack: f64,
     pub hp: f64,
     pub speed: f64,

@@ -3,6 +3,7 @@
 extern crate chrono;
 #[macro_use] extern crate error_chain;
 #[macro_use] extern crate log;
+extern crate postgis;
 #[macro_use] extern crate postgres;
 #[macro_use] extern crate postgres_derive;
 extern crate r2d2;

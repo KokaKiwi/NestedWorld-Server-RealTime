@@ -103,7 +103,9 @@ pub fn prepare_wild_combat(conn: &mut Connection, monsters: &[i32], ai_monster: 
         name: monster_name,
         level:average_level};
     builder.add_opponent_monster(opp_monster);
-    builder.start(end::end);
+    builder.start(|res| {
+        end::end(res, conn)
+    });
 }
 
 pub fn prepare_duel_combat(user_conn: &mut Connection, opp_conn: &mut Connection, user_monsters: &[i32], opp_monsters: &[i32]) {
@@ -144,10 +146,12 @@ pub fn prepare_duel_combat(user_conn: &mut Connection, opp_conn: &mut Connection
     };
 
     add_opponent_monster(&mut db_conn, opp_monsters, &mut builder);
-    builder.start(end::end);
+    builder.start(move |res| {
+        end::end(res, user_conn);
+    });
 }
 
-pub fn prepare_portal_combat(user_conn: &mut Connection, user_monster: i32, opp_monster: i32,  opp_conn: Option<Connection>) {
+pub fn prepare_portal_combat(user_conn: &mut Connection, user_monster: i32, opp_monster: i32, portal: i32, opp_conn: Option<Connection>) {
     let mut db_conn = user_conn.ctx.db.get_connection().unwrap();
 
     let user = match get_user(user_conn, &mut db_conn) {
@@ -184,5 +188,12 @@ pub fn prepare_portal_combat(user_conn: &mut Connection, user_monster: i32, opp_
     };
 
     add_opponent_monster(&mut db_conn, &[opp_monster], &mut builder);
-    builder.start(end::end);
+
+
+
+
+    builder.start(|res| {
+        end::endPortal(res, user_conn, portal)
+
+    });
 }

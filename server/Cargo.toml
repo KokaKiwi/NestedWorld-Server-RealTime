@@ -12,6 +12,7 @@ jwt = "0.4"
 log = "0.3"
 mioco = "0.8"
 nestedworld-db = { path = "../db" }
+postgis = "0.3.0"
 rand = "0.3"
 rmp = "0.7"
 rustc-serialize = "0.3"
