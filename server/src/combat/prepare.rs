@@ -103,8 +103,12 @@ pub fn prepare_wild_combat(conn: &mut Connection, monsters: &[i32], ai_monster: 
         name: monster_name,
         level:average_level};
     builder.add_opponent_monster(opp_monster);
-    builder.start(|res| {
-        end::end(res, conn)
+    let mut builder_conn = match conn.try_clone() {
+        Ok(conn) => conn,
+        Err(e) => return
+    };
+    builder.start(move |res| {
+        end::end(res, &mut builder_conn)
     });
 }
 
@@ -144,10 +148,13 @@ pub fn prepare_duel_combat(user_conn: &mut Connection, opp_conn: &mut Connection
         Ok(level) => level,
         _ => return,
     };
-
     add_opponent_monster(&mut db_conn, opp_monsters, &mut builder);
+    let mut builder_conn = match user_conn.try_clone() {
+        Ok(conn) => conn,
+        Err(e) => return
+    };
     builder.start(move |res| {
-        end::end(res, user_conn);
+        end::end(res, &mut builder_conn);
     });
 }
 
@@ -188,12 +195,12 @@ pub fn prepare_portal_combat(user_conn: &mut Connection, user_monster: i32, opp_
     };
 
     add_opponent_monster(&mut db_conn, &[opp_monster], &mut builder);
-
-
-
-
-    builder.start(|res| {
-        end::endPortal(res, user_conn, portal)
+    let mut builder_conn = match user_conn.try_clone() {
+        Ok(conn) => conn,
+        Err(e) => return
+    };
+    builder.start(move |res| {
+        end::endPortal(res, &mut builder_conn, portal)
 
     });
 }
