@@ -10,6 +10,9 @@ pub struct Portal {
     pub portal_type: ElementType,
     pub created: NaiveDate,
     pub captured: Option<NaiveDate>,
+    pub captured_by: Option<i32>,
+    pub umonster_on: Option<i32>,
+    pub monster_on: Option<i32>,
     pub duration: Option<u32>,
     pub catching_end: Option<NaiveDate>,
 }
@@ -25,11 +28,13 @@ impl Model for Portal {
         let portal = rows.iter().next().map(|row| {
             Portal {
                 id: id,
-
                 point: row.get("point"),
                 portal_type: row.get("type"),
                 created: row.get("created"),
                 captured: row.get("captured"),
+                captured_by: row.get("captured_by"),
+                umonster_on: row.get("umonster_on"),
+                monster_on: row.get("monster_on"),
                 duration: row.get("duration"),
                 catching_end: row.get("catching_end"),
             }
