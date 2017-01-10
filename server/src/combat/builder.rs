@@ -1,5 +1,8 @@
+use mioco::sync::mpsc as sync;
 use net::conn::Connection;
+use net::msg::combat::Message;
 use super::result::CombatResult;
+use super::runner as run;
 
 mod db {
     pub use ::db::models::monster::Monster;
@@ -44,7 +47,42 @@ impl CombatBuilder {
     pub fn start<F>(self, callback: F)
         where F: FnOnce(CombatResult) + Send + 'static
     {
+        let mut ctx = self.user.infos.conn.ctx.clone();
+        let mut monsters = run::Monsters::new();
+
+        let (user, user_handle) = self.user.build(&mut monsters);
+        let (opponent, opponent_handle) = self.opponent.build(&mut monsters);
+
+        let handle = CombatHandle {
+            user: user_handle,
+            opponent: opponent_handle,
+        };
+        let id = ctx.add_combat(handle);
+
+        let combat = run::Combat {
+            id: id,
+            ty: self.ty,
+            env: self.env,
+            user: user,
+            opponent: opponent,
+            monsters: monsters,
+        };
+        ::mioco::spawn(move || {
+            callback(combat.run())
+        });
     }
+}
+
+#[derive(Clone)]
+pub struct CombatHandle {
+    pub user: UserHandle,
+    pub opponent: Option<UserHandle>,
+}
+
+#[derive(Clone)]
+pub struct UserHandle {
+    pub id: u32,
+    pub sender: sync::Sender<Message>,
 }
 
 #[derive(Debug)]
@@ -53,17 +91,17 @@ pub struct User {
     pub monsters: Vec<db::UserMonster>,
 }
 
-pub struct UserInfos {
-    pub user: db::User,
-    pub conn: Connection,
-}
+impl User {
+    pub fn build(self, monsters: &mut run::Monsters) -> (run::User, UserHandle) {
+        let (infos, handle) = self.infos.build();
 
-impl ::std::fmt::Debug for UserInfos {
-    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
-        f.debug_struct("UserInfos")
-         .field("user", &self.user)
-         .field("conn", &self.conn.name())
-         .finish()
+        let user = run::User {
+            infos: infos,
+            monsters: monsters.push_all(self.monsters),
+            current: None,
+        };
+
+        (user, handle)
     }
 }
 
@@ -73,10 +111,61 @@ pub struct Opponent {
     pub monsters: Vec<Monster>,
 }
 
+impl Opponent {
+    fn build(self, monsters: &mut run::Monsters) -> (run::Opponent, Option<UserHandle>) {
+        let (ty, handle) = self.ty.build();
+
+        let opponent = run::Opponent {
+            ty: ty,
+            monsters: monsters.push_all(self.monsters),
+            current: None,
+        };
+
+        (opponent, handle)
+    }
+}
+
 #[derive(Debug)]
 pub enum OpponentType {
     AI,
     User(UserInfos),
+}
+
+impl OpponentType {
+    fn build(self) -> (run::OpponentType, Option<UserHandle>) {
+        match self {
+            OpponentType::AI => (run::OpponentType::AI, None),
+            OpponentType::User(infos) => {
+                let (infos, handle) = infos.build();
+                let ty = run::OpponentType::User(infos);
+                (ty, Some(handle))
+            }
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct UserInfos {
+    pub user: db::User,
+    pub conn: Connection,
+}
+
+impl UserInfos {
+    fn build(self) -> (run::UserInfos, UserHandle) {
+        let (tx, rx) = sync::channel();
+
+        let handle = UserHandle {
+            id: self.user.id as u32,
+            sender: tx,
+        };
+        let infos = run::UserInfos {
+            user: self.user,
+            conn: self.conn,
+            receiver: rx,
+        };
+
+        (infos, handle)
+    }
 }
 
 #[derive(Debug)]
@@ -84,4 +173,16 @@ pub struct Monster {
     pub monster: db::Monster,
     pub name: String,
     pub level: u32,
+}
+
+impl Into<run::Monster> for Monster {
+    fn into(self) -> run::Monster {
+        run::Monster {
+            user_monster: None,
+            name: self.name,
+            level: self.level,
+            hp: self.monster.hp as u32,
+            monster: self.monster,
+        }
+    }
 }

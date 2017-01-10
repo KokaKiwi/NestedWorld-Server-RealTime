@@ -60,6 +60,8 @@ pub fn handle(conn: &mut Connection, msg: Ask) {
             return
         }
     };
+    let opponent_user = opponent_conn.session().expect("No user session?!")
+                            .user.get().unwrap().clone();
 
     send_result(conn, &msg.header, ResultData::ok(None));
 
@@ -72,6 +74,7 @@ pub fn handle(conn: &mut Connection, msg: Ask) {
             header: msg.header.clone(),
             origin: Origin::Duel {
                 user: ::net::msg::combat::data::User {
+                    id: user.id as u32,
                     pseudo: user.pseudo.clone(),
                 },
             },
@@ -82,6 +85,7 @@ pub fn handle(conn: &mut Connection, msg: Ask) {
             header: msg.header.clone(),
             origin: Origin::Duel {
                 user: ::net::msg::combat::data::User {
+                    id: opponent_user.id as u32,
                     pseudo: msg.opponent,
                 },
             },

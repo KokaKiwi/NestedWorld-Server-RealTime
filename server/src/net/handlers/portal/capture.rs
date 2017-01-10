@@ -104,7 +104,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
             let now = UTC::now();
             db_conn.execute("UPDATE portals SET captured = $1, captured_by = $2, umonster_on = $3,
             monster_on = $7, duration = $4, catching_end = $5 WHERE id = $6",
-            &[&now.to_string(), &user.id, &umonster.id, &duration, &now.checked_add(Duration::seconds(duration as i64)).unwrap(), &portal.id, &monster.id]);
+            &[&now.to_string(), &user.id, &umonster.id, &duration, &now.checked_add(Duration::seconds(duration as i64)).unwrap(), &portal.id, &monster.id]).unwrap();
             rmp_map![
                 "state" => "vacant",
             ]
@@ -112,7 +112,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
     };
     send_result(conn, &msg.header, ResultData::ok(Some(data)));
     match portal.captured_by {
-        Some(user) =>  {
+        Some(_user) =>  {
             let opponent_conn = match {
                let opp = portal.captured_by.unwrap();
                let users = conn.ctx.users.lock().unwrap_or_else(|e| e.into_inner());

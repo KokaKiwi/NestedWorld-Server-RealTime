@@ -3,7 +3,6 @@ use super::math::experience;
 use super::math::coefficient;
 use db::models::geo::Portal;
 use db::models::utils::Model;
-use net::msg::combat::monster_ko::capture::Capture;
 use net::conn::Connection;
 use chrono::offset::utc::UTC;
 use chrono::Duration;
@@ -18,12 +17,12 @@ pub fn end(result : CombatResult, conn: &mut Connection) {
             level += 1;
         }
         let db_conn = conn.ctx.db.get_connection().unwrap();
-        db_conn.execute("UPDATE user_monsters SET experience = $1, level = $2 WHERE id = $3", &[&experience, &level, &monster.id]);
+        db_conn.execute("UPDATE user_monsters SET experience = $1, level = $2 WHERE id = $3", &[&experience, &level, &monster.id]).unwrap();
     }
 }
 
 
-pub fn endPortal(result : CombatResult, conn: &mut Connection, id_portal: i32) {
+pub fn end_portal(result : CombatResult, conn: &mut Connection, id_portal: i32) {
     if result.win == true {
         let db_conn = conn.ctx.db.get_connection().unwrap();
         let portal = match Portal::get_by_id(&db_conn, id_portal) {
@@ -39,7 +38,7 @@ pub fn endPortal(result : CombatResult, conn: &mut Connection, id_portal: i32) {
         let started = UTC::now();
         let end = started.add(time);
         db_conn.execute("UPDATE portals SET duration = $1, captured = $2, catching_end = $3 WHERE id = $4",
-                        &[&time.num_seconds(), &started.to_rfc3339(), &end.to_rfc3339(), &id_portal]);
+                        &[&time.num_seconds(), &started.to_rfc3339(), &end.to_rfc3339(), &id_portal]).unwrap();
     }
     end(result, conn);
 }

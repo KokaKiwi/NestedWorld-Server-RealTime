@@ -98,6 +98,12 @@ impl Connection {
     }
 }
 
+impl ::std::fmt::Debug for Connection {
+    fn fmt(&self, f: &mut ::std::fmt::Formatter) -> ::std::fmt::Result {
+        self.name().fmt(f)
+    }
+}
+
 pub fn run(ctx: Context, conn: TcpStream) {
     let conn = Connection::new(ctx, conn);
 

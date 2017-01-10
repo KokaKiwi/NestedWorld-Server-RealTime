@@ -200,7 +200,6 @@ pub fn prepare_portal_combat(user_conn: &mut Connection, user_monster: i32, opp_
         Err(e) => return
     };
     builder.start(move |res| {
-        end::endPortal(res, &mut builder_conn, portal)
-
+        end::end_portal(res, &mut builder_conn, portal)
     });
 }
