@@ -17,16 +17,15 @@ pub fn handle(conn: &mut Connection, msg: Message) {
                 debug!("Conversation callback error: {}", e);
             }
         }
-        return;
     } else if let Message::Result(_) = msg {
         send_result(conn, &msg.header(), ResultData::err("invalid-msg",
                                                             "Unknown result ID", None));
-    }
-
-    match msg {
-        Message::Authenticate(msg) => auth::handle(conn, msg),
-        Message::Combat(msg) => combat::handle(conn, msg),
-        Message::Portal(msg) => portal::handle(conn, msg),
-        _ => {}
+    } else {
+        match msg {
+            Message::Authenticate(msg) => auth::handle(conn, msg),
+            Message::Combat(msg) => combat::handle(conn, msg),
+            Message::Portal(msg) => portal::handle(conn, msg),
+            _ => {}
+        }
     }
 }
