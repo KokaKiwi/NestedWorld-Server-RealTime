@@ -1,4 +1,6 @@
 use super::monster::Monster;
+use rand::distributions::{IndependentSample, Range};
+use rand;
 
 pub struct WildMonster {
     pub monster: Monster
@@ -10,7 +12,7 @@ impl WildMonster {
         let query_random = r#"
             SELECT name, type, attack, hp, speed, defense
             FROM monsters
-            ORDER BY RANDOM()
+            WHERE id=1
             LIMIT 1
         "#;
 

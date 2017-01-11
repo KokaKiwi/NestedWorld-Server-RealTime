@@ -15,10 +15,10 @@ use rand;
 pub fn send_random_combat(conn: &mut Connection) {
     debug!("Starting the random combat !");
     let mut rng = rand::thread_rng();
-    let between = Range::new(0, 140);
+    let between = Range::new(0, 120);
 
     loop {
-        let time =std::time::Duration::from_millis(120 + between.ind_sample(&mut rng));
+        let time =std::time::Duration::from_millis(140 + between.ind_sample(&mut rng));
         mioco::sleep(time);
 
         let mut db_conn = conn.ctx.db.get_connection().unwrap();

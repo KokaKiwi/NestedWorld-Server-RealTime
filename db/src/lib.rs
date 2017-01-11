@@ -1,4 +1,5 @@
 #![feature(proc_macro)]
+#![feature(rand)]
 #![recursion_limit = "1024"]
 extern crate chrono;
 #[macro_use] extern crate error_chain;
@@ -6,6 +7,7 @@ extern crate chrono;
 extern crate postgis;
 #[macro_use] extern crate postgres;
 #[macro_use] extern crate postgres_derive;
+extern crate rand;
 extern crate r2d2;
 extern crate r2d2_postgres;
 extern crate serde_json;
