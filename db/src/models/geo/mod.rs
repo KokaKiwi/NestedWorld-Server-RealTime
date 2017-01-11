@@ -14,7 +14,7 @@ pub struct Portal {
     pub captured_by: Option<i32>,
     pub umonster_on: Option<i32>,
     pub monster_on: Option<i32>,
-    pub duration: Option<u32>,
+    pub duration: Option<i32>,
     pub catching_end: Option<DateTime<UTC>>,
 }
 
