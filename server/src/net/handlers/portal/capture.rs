@@ -12,6 +12,9 @@ use combat::math::coefficient;
 use combat::prepare::prepare_portal_combat;
 
 pub fn handle(conn: &mut Connection, msg: Capture) {
+    let mut msg = msg;
+    let uuid = msg.header.ensure_id();
+
     let mut db_conn = conn.ctx.db.get_connection().unwrap();
     let portal = match Portal::get_by_id(&db_conn, msg.portal_id as i32) {
         Ok(Some(portal)) => portal,
@@ -144,7 +147,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
                    return;
                }
            };
-            prepare_portal_combat(conn, umonster.id, opp_umonster.id, portal.id, Some(opponent_conn));
+            prepare_portal_combat(conn, umonster.id, opp_umonster.id, portal.id, Some(opponent_conn), uuid);
         }
         _ => {},
     }

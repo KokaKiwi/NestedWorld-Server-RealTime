@@ -16,6 +16,7 @@ mod db {
 }
 
 pub struct Combat {
+    pub uuid: String,
     pub id: u32,
     pub ty: String,
     pub env: String,
@@ -60,6 +61,9 @@ impl Combat {
         let opponent_monster = opponent_monster_ref.get(&self.monsters);
         self.opponent.current = Some(opponent_monster_ref);
 
+        let mut header = MessageHeader::new();
+        header.id = Some(self.uuid.clone());
+
         // Send start to user
         let user = data::User {
             monster: user_monster.as_data(user_monster_ref.id()),
@@ -78,7 +82,7 @@ impl Combat {
         };
 
         let start = combat::Start {
-            header: MessageHeader::new(),
+            header: header.clone(),
             combat_id: self.id,
             user: user,
             opponent: opponent,
@@ -104,7 +108,7 @@ impl Combat {
             };
 
             let start = combat::Start {
-                header: MessageHeader::new(),
+                header: header.clone(),
                 combat_id: self.id,
                 user: user,
                 opponent: opponent,

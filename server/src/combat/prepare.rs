@@ -15,7 +15,7 @@ use super::end;
 
 //add user monster to th builder and return the average level66
 
-pub fn get_user(conn: &mut Connection, db_conn: &mut db::Connection) -> Result<User, String> {
+pub fn get_user(conn: &mut Connection, db_conn: &db::Connection) -> Result<User, String> {
     let session : Session = match conn.session() {
         Some(session) => session,
         None => return Err("User is not connected".into()),
@@ -68,7 +68,8 @@ pub fn add_opponent_monster(db_conn: &mut db::Connection, monsters: &[i32], buil
     }
 }
 
-pub fn prepare_wild_combat(conn: &mut Connection, monsters: &[i32], ai_monster: i32) {
+pub fn prepare_wild_combat(conn: &mut Connection, monsters: &[i32], ai_monster: i32,
+                           id: String) {
     let mut db_conn = conn.ctx.db.get_connection().unwrap();
 
     let user = match get_user(conn, &mut db_conn) {
@@ -97,8 +98,8 @@ pub fn prepare_wild_combat(conn: &mut Connection, monsters: &[i32], ai_monster: 
         },
     };
 
-    let mut builder : builder::CombatBuilder = builder::CombatBuilder::new(user_infos,
-                                            builder::OpponentType::AI, "wild", "city");
+    let mut builder : builder::CombatBuilder = builder::CombatBuilder::new(id, user_infos,
+                                                                           builder::OpponentType::AI, "wild", "city");
 
     //add user monsters in the builder and compute average level
     let average_level = match add_user_monster(&mut db_conn, monsters, &mut builder) {
@@ -140,7 +141,8 @@ pub fn prepare_wild_combat(conn: &mut Connection, monsters: &[i32], ai_monster: 
     });
 }
 
-pub fn prepare_duel_combat(user_conn: &mut Connection, opp_conn: &mut Connection, user_monsters: &[i32], opp_monsters: &[i32]) {
+pub fn prepare_duel_combat(user_conn: &mut Connection, opp_conn: &mut Connection, user_monsters: &[i32], opp_monsters: &[i32],
+                           uuid: String) {
     let mut db_conn = user_conn.ctx.db.get_connection().unwrap();
 
     let user = match get_user(user_conn, &mut db_conn) {
@@ -168,8 +170,9 @@ pub fn prepare_duel_combat(user_conn: &mut Connection, opp_conn: &mut Connection
         Err(e) => return
     }};
 
-    let mut builder : builder::CombatBuilder = builder::CombatBuilder::new(user_infos,
-                                            builder::OpponentType::User(opp_infos), "duel", "city");
+    let mut builder : builder::CombatBuilder =
+        builder::CombatBuilder::new(uuid, user_infos,
+                                    builder::OpponentType::User(opp_infos), "duel", "city");
 
     //add user monsters and opponent monsters in the builder
     match add_user_monster(&mut db_conn, user_monsters, &mut builder) {
@@ -186,7 +189,7 @@ pub fn prepare_duel_combat(user_conn: &mut Connection, opp_conn: &mut Connection
     });
 }
 
-pub fn prepare_portal_combat(user_conn: &mut Connection, user_monster: i32, opp_monster: i32, portal: i32, opp_conn: Option<Connection>) {
+pub fn prepare_portal_combat(user_conn: &mut Connection, user_monster: i32, opp_monster: i32, portal: i32, opp_conn: Option<Connection>, id: String) {
     let mut db_conn = user_conn.ctx.db.get_connection().unwrap();
 
     let user = match get_user(user_conn, &mut db_conn) {
@@ -201,20 +204,25 @@ pub fn prepare_portal_combat(user_conn: &mut Connection, user_monster: i32, opp_
 
     //knowing if opponent is AI or player and construct builder arcording to it.
 
-    let mut builder = match opp_conn {
-        Some(mut opp_conn) => {
-            let opponent = match get_user(&mut opp_conn, &mut db_conn) {
+    let opponent_type = match opp_conn {
+        Some(mut conn) => {
+            let opponent = match get_user(&mut conn, &db_conn) {
                 Ok(user) => user,
-                Err(e) => return
+                Err(_) => return,
             };
-            let opp_infos = builder::UserInfos {user: opponent, conn: match opp_conn.try_clone() {
-                Ok(conn) => conn,
-                Err(e) => return
-            }};
-            builder::CombatBuilder::new(user_infos, builder::OpponentType::User(opp_infos), "dungeon", "city")
+            let opponent_infos = builder::UserInfos {
+                user: opponent,
+                conn: match conn.try_clone() {
+                    Ok(conn) => conn,
+                    Err(_) => return,
+                },
+            };
+            builder::OpponentType::User(opponent_infos)
         }
-        None => builder::CombatBuilder::new(user_infos, builder::OpponentType::AI, "dungeon", "city")
+        None => builder::OpponentType::AI,
     };
+    let mut builder = builder::CombatBuilder::new(id, user_infos, opponent_type,
+                                                  "dungeon", "city");
 
     //add user monsters and opponent monsters in the builder
     match add_user_monster(&mut db_conn, &[user_monster], &mut builder) {

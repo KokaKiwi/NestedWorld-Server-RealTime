@@ -68,6 +68,9 @@ pub fn handle(conn: &mut Connection, msg: Ask) {
     // send a combat available to the two players
 
     let mut conn = conn.try_clone().unwrap();
+    let mut msg = msg;
+    let uuid = msg.header.ensure_id();
+
     ::mioco::spawn(move || {
         // Send to sender
         let avail_opp = Available {
@@ -108,6 +111,6 @@ pub fn handle(conn: &mut Connection, msg: Ask) {
             Err(_) => return
         };
 
-        prepare_duel_combat(&mut conn, &mut opponent_conn, &user_monsters, &opponent_monsters);
+        prepare_duel_combat(&mut conn, &mut opponent_conn, &user_monsters, &opponent_monsters, uuid);
     });
 }

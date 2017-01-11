@@ -39,8 +39,10 @@ pub fn send_random_combat(conn: &mut Connection) {
         };
 
         debug!("monster created");
+        let mut header = MessageHeader::new();
+        let uuid = header.ensure_id();
         let msg = Available {
-            header: MessageHeader::new(),
+            header: header.clone(),
             origin: Origin::WildMonster {
                 monster_id: wild_monster.monster.id as u32
             },
@@ -70,7 +72,7 @@ pub fn send_random_combat(conn: &mut Connection) {
                   let monsters: Vec<i32> = fields::get(_data, "monsters").unwrap_or(vec![]);
                   if monsters.len() > 0 {
                       debug!("GO TO THE COMBAT !");
-                      prepare_wild_combat(conn, &monsters, wild_monster.monster.id);
+                      prepare_wild_combat(conn, &monsters, wild_monster.monster.id, uuid);
                   }
               }
           }

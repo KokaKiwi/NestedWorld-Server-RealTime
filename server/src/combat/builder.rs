@@ -12,6 +12,7 @@ mod db {
 
 #[derive(Debug)]
 pub struct CombatBuilder {
+    pub uuid: String,
     pub user: User,
     pub opponent: Opponent,
     pub ty: String,
@@ -19,8 +20,9 @@ pub struct CombatBuilder {
 }
 
 impl CombatBuilder {
-    pub fn new(user: UserInfos, opponent: OpponentType, ty: &str, env: &str) -> CombatBuilder {
+    pub fn new(uuid: String, user: UserInfos, opponent: OpponentType, ty: &str, env: &str) -> CombatBuilder {
         CombatBuilder {
+            uuid: uuid,
             user: User {
                 infos: user,
                 monsters: Vec::new(),
@@ -60,6 +62,7 @@ impl CombatBuilder {
         let id = ctx.add_combat(handle);
 
         let combat = run::Combat {
+            uuid: self.uuid,
             id: id,
             ty: self.ty,
             env: self.env,
