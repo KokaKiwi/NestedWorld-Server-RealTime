@@ -1,12 +1,15 @@
-use net::conn::Connection;
 use db::models::token::Session;
 use db::models::user_monster::UserMonster;
 use db::models::monster::Monster;
 use db::models::user::User;
 use db::models::utils::Model;
+use net::conn::Connection;
+use net::handlers::helpers::result::send_result;
+
 mod db {
     pub use db::Connection;
 }
+
 use super::builder;
 use super::end;
 
@@ -30,12 +33,14 @@ pub fn get_user(conn: &mut Connection, db_conn: &mut db::Connection) -> Result<U
 
 pub fn add_user_monster(db_conn: &mut db::Connection, monsters: &[i32], builder: &mut builder::CombatBuilder) -> Result<u32, String> {
     let mut average_level : u32 = 0;
-    for monster in monsters {
-        let mut user_monster = match UserMonster::get_by_id(&db_conn, *monster) {
+    for &monster_id in monsters {
+        let mut user_monster = match UserMonster::get_by_id(&db_conn, monster_id) {
             Ok(Some(monster)) => monster,
-            _ => return Err("User not sended the good id's !".into()),
+            Ok(None) => return Err(format!("Invalid monster id: {}", monster_id)),
+            Err(e) => return Err(format!("DB error: {}", e)),
         };
         user_monster.monster.fetch(&db_conn).unwrap();
+        debug!("{:?}", user_monster);
         builder.add_user_monster(&user_monster);
         average_level += user_monster.level as u32;
     }
@@ -64,24 +69,33 @@ pub fn add_opponent_monster(db_conn: &mut db::Connection, monsters: &[i32], buil
 }
 
 pub fn prepare_wild_combat(conn: &mut Connection, monsters: &[i32], ai_monster: i32) {
-
     let mut db_conn = conn.ctx.db.get_connection().unwrap();
 
     let user = match get_user(conn, &mut db_conn) {
         Ok(user) => user,
-        Err(e) => return
+        Err(e) => {
+            debug!("Error: {:?}", e);
+            return;
+        }
     };
 
     if monsters.is_empty() {
+        debug!("No monsters?!");
         return;
     }
 
     // Start builder
 
-    let user_infos = builder::UserInfos {user: user, conn: match conn.try_clone() {
-        Ok(conn) => conn,
-        Err(e) => return
-    }};
+    let user_infos = builder::UserInfos {
+        user: user,
+        conn: match conn.try_clone() {
+            Ok(conn) => conn,
+            Err(e) => {
+                debug!("Connection error: {}", e);
+                return;
+            }
+        },
+    };
 
     let mut builder : builder::CombatBuilder = builder::CombatBuilder::new(user_infos,
                                             builder::OpponentType::AI, "wild", "city");
@@ -89,13 +103,23 @@ pub fn prepare_wild_combat(conn: &mut Connection, monsters: &[i32], ai_monster: 
     //add user monsters in the builder and compute average level
     let average_level = match add_user_monster(&mut db_conn, monsters, &mut builder) {
         Ok(level) => level,
-        _ => return,
+        Err(e) => {
+            debug!("Unknown error: {:?}", e);
+            return;
+        }
     };
 
     //add IA monsters in the builder
     let opp_db_monster = match Monster::get_by_id(&mut db_conn, ai_monster) {
         Ok(Some(monster)) => monster,
-        _ => return,
+        Ok(None) => {
+            debug!("No monster for id {}", ai_monster);
+            return;
+        }
+        Err(e) => {
+            debug!("Error: {}", e);
+            return;
+        }
     };
 
     let monster_name = opp_db_monster.name.clone();
@@ -106,7 +130,10 @@ pub fn prepare_wild_combat(conn: &mut Connection, monsters: &[i32], ai_monster: 
     builder.add_opponent_monster(opp_monster);
     let mut builder_conn = match conn.try_clone() {
         Ok(conn) => conn,
-        Err(e) => return
+        Err(e) => {
+            debug!("{}", e);
+            return;
+        }
     };
     builder.start(move |res| {
         end::end(res, &mut builder_conn)

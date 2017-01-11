@@ -53,6 +53,7 @@ impl Combat {
         // Choose first monsters
         let user_monster_ref = self.user.monsters[0];
         let user_monster = user_monster_ref.get(&self.monsters);
+        debug!("User monster: {:?}", user_monster);
         self.user.current = Some(user_monster_ref);
 
         let opponent_monster_ref = self.opponent.monsters[0];
@@ -323,7 +324,7 @@ impl From<db::UserMonster> for Monster {
         Monster {
             name: monster.surname.clone(),
             level: monster.level as u32,
-            hp: monster.level as u32,
+            hp: monster.monster.get().expect("No monster ?!").hp as u32,
             monster: monster.monster.get().expect("No monster ?!").clone(),
             user_monster: Some(monster),
         }
