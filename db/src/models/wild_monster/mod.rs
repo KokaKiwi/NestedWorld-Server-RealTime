@@ -1,6 +1,5 @@
 use super::monster::Monster;
-use rand::distributions::{IndependentSample, Range};
-use rand;
+use rand::Rng;
 
 pub struct WildMonster {
     pub monster: Monster
@@ -12,24 +11,24 @@ impl WildMonster {
         let query_random = r#"
             SELECT name, type, attack, hp, speed, defense
             FROM monsters
-            WHERE id=1
-            LIMIT 1
         "#;
 
         let rows = try!(conn.query(query_random, &[]));
-        let monster = rows.iter().next().map(|row| {
-            WildMonster {
-                monster: Monster {
-                    id: row.get("id"),
-                    name: row.get("name"),
-                    monster_type: row.get("type"),
-                    attack: row.get("attack"),
-                    hp: row.get("hp"),
-                    speed: row.get("speed"),
-                    defense: row.get("defense"),
-                }
+        let rows: Vec<_> = rows.iter().collect();
+
+        let mut rng = ::rand::thread_rng();
+        let row = rng.choose(&rows);
+
+        Ok(row.map(|row| WildMonster {
+            monster: Monster {
+                id: row.get("id"),
+                name: row.get("name"),
+                monster_type: row.get("type"),
+                attack: row.get("attack"),
+                hp: row.get("hp"),
+                speed: row.get("speed"),
+                defense: row.get("defense"),
             }
-        });
-        Ok(monster)
+        }))
     }
 }

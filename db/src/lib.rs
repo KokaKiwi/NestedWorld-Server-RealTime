@@ -1,5 +1,4 @@
 #![feature(proc_macro)]
-#![feature(rand)]
 #![recursion_limit = "1024"]
 extern crate chrono;
 #[macro_use] extern crate error_chain;
