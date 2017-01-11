@@ -121,6 +121,7 @@ pub fn run(ctx: Context, conn: TcpStream) {
 
     let _event_handle = match conn.try_clone() {
         Ok(mut conn) => {
+            debug("Start this fucking THREAD !")
             mioco::spawn(move || event::send_random_combat(&mut conn))
         }
         Err(err) => {
