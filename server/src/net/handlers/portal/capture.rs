@@ -104,11 +104,11 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
 
         ]},
         _ => {
-            let duration = 1800.0 * coefficient(portal.portal_type, monster.monster_type.clone());
+            let duration = (1800.0 * coefficient(portal.portal_type, monster.monster_type.clone())) as i32;
             let now = UTC::now();
             db_conn.execute("UPDATE portals SET captured = $1, captured_by = $2, umonster_on = $3,
             monster_on = $7, duration = $4, catching_end = $5 WHERE id = $6",
-            &[&now, &user.id as i32, &umonster.id as i32, &duration as i32, &now.checked_add(Duration::seconds(duration as i64)).unwrap(), &portal.id as i32, &monster.id as i32]).unwrap();
+            &[&now, &user.id, &umonster.id, &duration, &now.checked_add(Duration::seconds(duration as i64)).unwrap(), &portal.id, &monster.id]).unwrap();
             rmp_map![
                 "state" => "vacant",
             ]
