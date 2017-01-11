@@ -3,7 +3,16 @@ use db::models::user_monster::UserMonster;
 use db::models::monster::Monster;
 use db::models::user::User;
 use db::models::utils::Model;
+use net::msg::combat::Available;
+use net::msg::combat::available::Origin;
 use net::conn::Connection;
+use net::msg::MessageHeader;
+use net::msg::ResultMessage;
+use net::msg::Message;
+use net::msg::utils::fields;
+use chrono::offset::utc::UTC;
+use chrono::Duration;
+use std::ops::Add;
 
 mod db {
     pub use db::Connection;
@@ -196,32 +205,44 @@ pub fn prepare_portal_combat(user_conn: &mut Connection, user_monster: i32, opp_
         Err(e) => return
     };
 
-    let user_infos = builder::UserInfos {user: user, conn: match user_conn.try_clone() {
+    let user_infos = builder::UserInfos {user: user.clone(), conn: match user_conn.try_clone() {
         Ok(conn) => conn,
         Err(e) => return
     }};
 
     //knowing if opponent is AI or player and construct builder arcording to it.
 
-    let opponent_type = match opp_conn {
-        Some(mut conn) => {
-            let opponent = match get_user(&mut conn, &db_conn) {
-                Ok(user) => user,
-                Err(_) => return,
-            };
-            let opponent_infos = builder::UserInfos {
-                user: opponent,
-                conn: match conn.try_clone() {
-                    Ok(conn) => conn,
-                    Err(_) => return,
-                },
-            };
-            builder::OpponentType::User(opponent_infos)
-        }
-        None => builder::OpponentType::AI,
-    };
+    let opponent_type = builder::OpponentType::AI;
     let mut builder = builder::CombatBuilder::new(id, user_infos, opponent_type,
                                                   "dungeon", "city");
+
+      let msg = Available {
+          header: MessageHeader::new(),
+          origin: Origin::Portal {
+              user: ::net::msg::combat::data::User {
+                  id: user.id as u32,
+                  pseudo: user.pseudo.clone(),
+              },
+              timeout: UTC::now()
+          },
+          monsters_max_count: 1,
+      };
+
+      let rx = match user_conn.send_request(msg) {
+        Ok(rx) => rx,
+        Err(e) => {
+          debug!("Portal : {}", e);
+          return;
+        }
+      };
+      debug!("sended request for portal combat!");
+      let msg = match rx.recv() {
+        Ok(Message::Result(msg)) => msg,
+        _ => {
+          debug!("Inappropirate type of packet",);
+          return;
+        }
+      };
 
     //add user monsters and opponent monsters in the builder
     match add_user_monster(&mut db_conn, &[user_monster], &mut builder) {
@@ -234,6 +255,7 @@ pub fn prepare_portal_combat(user_conn: &mut Connection, user_monster: i32, opp_
         Ok(conn) => conn,
         Err(e) => return
     };
+
     builder.start(move |res| {
         end::end_portal(res, &mut builder_conn, portal)
     });
