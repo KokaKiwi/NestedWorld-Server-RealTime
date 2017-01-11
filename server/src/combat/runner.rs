@@ -7,6 +7,7 @@ use net::handlers::helpers::result::send_result;
 use net::msg::MessageHeader;
 use net::msg::combat;
 use net::msg::result::ResultData;
+use std::time::Duration;
 use super::result::CombatResult;
 
 mod db {
@@ -218,6 +219,9 @@ impl CombatLoop {
 
         let (target, target_id, attack) = match self.combat.opponent.ty {
             OpponentType::AI => {
+                // Wait a bit
+                ::mioco::sleep(Duration::from_millis(7500));
+
                 let target_ref = self.combat.user.current.expect("No monster?");
                 let target = target_ref.get(&mut self.combat.monsters).clone();
 

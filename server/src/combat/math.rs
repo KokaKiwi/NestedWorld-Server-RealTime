@@ -17,25 +17,22 @@ pub fn attack(monster: &Monster, level: i32, attack: &Attack, damage: Option<u32
         AttackType::AttackSp => {
             let between = Range::new(0.75, 1.25);
             let mut rng = rand::thread_rng();
-            between.ind_sample(&mut rng) },
+            between.ind_sample(&mut rng)
+        }
         AttackType::DefenseSp => {
             let between = Range::new(0.05, 0.15);
             let mut rng = rand::thread_rng();
-            between.ind_sample(&mut rng) }
+            between.ind_sample(&mut rng)
+        }
     };
 
-    if attack.attack_type == AttackType::Attack || attack.attack_type == AttackType::AttackSp {
-        let damage = (level as f64 * monster.attack / monster.defense * multiplier *
-                      coefficient(monster.monster_type.clone(), opp_monster_type)) as u32;
-        debug!("attack({:?}, {:?}, {:?}, None, {:?}) = {}", monster, level, attack, opp_monster_type, damage);
-        damage
-    }
-    else {
-        match damage {
-            Some(dam) => return dam.checked_add((monster.defense * level as f64 * multiplier * 0.25) as u32).unwrap_or(0),
-            None => return 0
-        }
-    }
+    let amount = match attack.attack_type {
+        AttackType::Attack | AttackType::AttackSp => (level as f64 * monster.attack * multiplier * 0.25 *
+                      coefficient(monster.monster_type.clone(), opp_monster_type)) as u32,
+        _ => (monster.defense * level as f64 * multiplier) as u32,
+    };
+    debug!("attack({:?}, {:?}, level={:?}, None, {:?}) = {}", monster, level, attack, opp_monster_type, amount);
+    amount
 }
 
 pub fn coefficient(attack:ElementType, defend:ElementType) -> f64 {
