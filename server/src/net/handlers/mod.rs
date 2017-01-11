@@ -1,5 +1,7 @@
 use super::conn::Connection;
 use super::msg::{MessageFull, Message};
+use super::msg::result::ResultData;
+use self::helpers::result::send_result;
 
 #[macro_use] pub mod helpers;
 mod auth;
@@ -16,6 +18,9 @@ pub fn handle(conn: &mut Connection, msg: Message) {
             }
         }
         return;
+    } else if let Message::Result(_) = msg {
+        send_result(conn, &msg.header(), ResultData::err("invalid-msg",
+                                                            "Unknown result ID", None));
     }
 
     match msg {
