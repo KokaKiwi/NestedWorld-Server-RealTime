@@ -127,6 +127,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
                    send_result(conn,
                                &msg.header,
                                ResultData::err("internal", "Internal server error", None));
+                   debug!("no connexion :(");
                    return;
                }
            };
@@ -136,6 +137,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
                    send_result(conn,
                                &msg.header,
                                ResultData::err("internal", "Internal server error", None));
+                   debug!("no monster on :(");
                    return;
                }
            };
@@ -145,6 +147,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
                    send_result(conn,
                                &msg.header,
                                ResultData::err("internal", "Internal server error", None));
+                   debug!("bad id !");
                    return;
                }
            };
