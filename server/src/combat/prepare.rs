@@ -60,10 +60,10 @@ pub fn add_opponent_monster(db_conn: &mut db::Connection, monsters: &[i32], buil
                                  level: monster.level as u32
                              });
                          },
-                    _ => {}
+                    _ => {debug!("opponent monster doesn't exist")}
                 }
             },
-            _ => {},
+            _ => {debug!("opponent monster id is not correct !")},
         };
     }
 }
