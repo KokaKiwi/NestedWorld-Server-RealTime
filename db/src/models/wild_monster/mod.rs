@@ -8,7 +8,7 @@ pub struct WildMonster {
 impl WildMonster {
     pub fn generate(conn: &::postgres::Connection) -> ::postgres::Result<Option<WildMonster>>{
 
-        debug!("Tru the query")
+        debug!("TrY the query");
         let query_random = r#"
             SELECT name, type, attack, hp, speed, defense
             FROM monsters
@@ -20,7 +20,7 @@ impl WildMonster {
         let mut rng = ::rand::thread_rng();
         let row = rng.choose(&rows);
 
-        debug!("QUERY DONE !")
+        debug!("QUERY DONE !");
         Ok(row.map(|row| WildMonster {
             monster: Monster {
                 id: row.get("id"),
