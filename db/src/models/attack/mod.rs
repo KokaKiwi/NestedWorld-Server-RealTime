@@ -1,7 +1,7 @@
 use super::utils::Model;
 
 #[derive(Debug, Clone, ToSql, FromSql, PartialEq, Eq)]
-#[postgres(name = "attack_type")]
+#[postgres(name = "attack_types")]
 pub enum AttackType {
     #[postgres(name = "attack")]
     Attack,
