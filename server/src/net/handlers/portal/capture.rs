@@ -108,7 +108,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
             let now = UTC::now();
             db_conn.execute("UPDATE portals SET captured = $1, captured_by = $2, umonster_on = $3,
             monster_on = $7, duration = $4, catching_end = $5 WHERE id = $6",
-            &[&now.to_string(), &user.id, &umonster.id, &duration, &now.checked_add(Duration::seconds(duration as i64)).unwrap(), &portal.id, &monster.id]).unwrap();
+            &[&now.to_rfc3339(), &user.id, &umonster.id, &duration, &now.checked_add(Duration::seconds(duration as i64)).unwrap().to_rfc3339(), &portal.id, &monster.id]).unwrap();
             rmp_map![
                 "state" => "vacant",
             ]
