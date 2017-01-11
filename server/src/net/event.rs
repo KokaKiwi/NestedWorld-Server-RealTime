@@ -1,5 +1,7 @@
 use super::conn::Connection;
 use db::models::wild_monster::WildMonster;
+use db::models::monster::Monster;
+use db::models::commons::ElementType;
 use combat::prepare::prepare_wild_combat;
 use net::msg::combat::Available;
 use net::msg::combat::available::Origin;
@@ -24,12 +26,16 @@ pub fn send_random_combat(conn: &mut Connection) {
         let mut db_conn = conn.ctx.db.get_connection().unwrap();
 
         debug!("Lets create the monster");
-        let wild_monster = match WildMonster::generate(&mut db_conn) {
-            Ok(Some(monster)) => monster,
-            _ => {
-                debug!("rtsittrist");
-                return;
-            },
+        let wild_monster = WildMonster {
+            monster: Monster {
+                id: 1,
+                name: String::from("hateful table"),
+                monster_type: ElementType::Earth,
+                attack: 38.0,
+                hp: 32.0,
+                speed: 47.0,
+                defense: 71.0,
+            }
         };
 
         debug!("monster created");
