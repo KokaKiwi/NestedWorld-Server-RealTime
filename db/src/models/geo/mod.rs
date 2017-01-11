@@ -1,20 +1,21 @@
 use super::utils::Model;
 use super::commons::ElementType;
 use postgis::ewkb::Point;
-use chrono::NaiveDate;
+use chrono::DateTime;
+use chrono::UTC;
 
 #[derive(Debug, Clone)]
 pub struct Portal {
     pub id: i32,
     pub point: Point,
     pub portal_type: ElementType,
-    pub created: NaiveDate,
-    pub captured: Option<NaiveDate>,
+    pub created: DateTime<UTC>,
+    pub captured: Option<DateTime<UTC>>,
     pub captured_by: Option<i32>,
     pub umonster_on: Option<i32>,
     pub monster_on: Option<i32>,
     pub duration: Option<u32>,
-    pub catching_end: Option<NaiveDate>,
+    pub catching_end: Option<DateTime<UTC>>,
 }
 
 impl Model for Portal {
