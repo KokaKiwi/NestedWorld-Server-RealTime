@@ -25,8 +25,10 @@ pub fn attack(monster: &Monster, level: i32, attack: &Attack, damage: Option<u32
     };
 
     if attack.attack_type == AttackType::Attack || attack.attack_type == AttackType::AttackSp {
-        return (level as f64 * monster.attack / monster.defense * multiplier *
-                coefficient(monster.monster_type.clone(), opp_monster_type)) as u32
+        let damage = (level as f64 * monster.attack / monster.defense * multiplier *
+                      coefficient(monster.monster_type.clone(), opp_monster_type)) as u32;
+        debug!("attack({:?}, {:?}, {:?}, None, {:?}) = {}", monster, level, attack, opp_monster_type, damage);
+        damage
     }
     else {
         match damage {
