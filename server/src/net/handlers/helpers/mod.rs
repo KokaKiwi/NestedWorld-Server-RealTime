@@ -1,2 +1,2 @@
-#[macro_use] mod macros;
+#[macro_use]pub mod macros;
 pub mod result;
