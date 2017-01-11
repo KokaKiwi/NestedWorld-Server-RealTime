@@ -8,7 +8,7 @@ use chrono::offset::utc::UTC;
 use chrono::Duration;
 use std::ops::Add;
 
-pub fn end(result : CombatResult, conn: &mut Connection) {
+pub fn end(result: CombatResult, conn: &mut Connection) {
     for monster in result.monsters {
         let mut level = monster.level;
         let mut experience = monster.experience + experience(result.win, result.average_lvl);
@@ -22,7 +22,7 @@ pub fn end(result : CombatResult, conn: &mut Connection) {
 }
 
 
-pub fn end_portal(result : CombatResult, conn: &mut Connection, id_portal: i32) {
+pub fn end_portal(result: CombatResult, conn: &mut Connection, id_portal: i32) {
     if result.win == true {
         let db_conn = conn.ctx.db.get_connection().unwrap();
         let portal = match Portal::get_by_id(&db_conn, id_portal) {

@@ -1,6 +1,12 @@
+use combat::math;
+use ctx::Context;
+use db::models::utils::Model;
 use mioco::sync::mpsc as sync;
 use net::conn::Connection;
+use net::handlers::helpers::result::send_result;
+use net::msg::MessageHeader;
 use net::msg::combat;
+use net::msg::result::ResultData;
 use super::result::CombatResult;
 
 mod db {
@@ -13,17 +19,31 @@ pub struct Combat {
     pub id: u32,
     pub ty: String,
     pub env: String,
+    pub ctx: Context,
     pub user: User,
     pub opponent: Opponent,
     pub monsters: Monsters,
 }
 
+#[derive(Debug, Clone)]
+enum State {
+    WaitUserAttack,
+    WaitOpponentAttack,
+}
+
+struct CombatLoop {
+    combat: Combat,
+    state: State,
+}
+
 impl Combat {
     pub fn run(mut self) -> CombatResult {
-        // Send start
         self.start();
 
-        unimplemented!()
+        CombatLoop {
+            combat: self,
+            state: State::WaitUserAttack,
+        }.run()
     }
 
     fn start(&mut self) {
@@ -96,6 +116,158 @@ impl Combat {
     }
 }
 
+impl CombatLoop {
+    fn run(mut self) -> CombatResult {
+        loop {
+            let result = match self.state {
+                State::WaitUserAttack => self.wait_user_attack(),
+                State::WaitOpponentAttack => self.wait_opponent_attack(),
+            };
+            if let Some(result) = result {
+                return result;
+            }
+        }
+    }
+
+    fn wait_user_attack(&mut self) -> Option<CombatResult> {
+        use db::models::attack::Attack;
+        use net::msg::combat::AttackReceived;
+        use net::msg::combat::attack_received as data;
+
+        let db_conn = self.combat.ctx.db.get_connection().unwrap();
+
+        let ref mut user = self.combat.user;
+        let msg = match user.infos.receiver.recv().unwrap() {
+            combat::Message::SendAttack(msg) => msg,
+            msg => {
+                debug!("Bad message received: {:?}", msg);
+                return None;
+            }
+        };
+
+        let monster_ref = user.current.expect("No monster?");
+        let monster = monster_ref.get(&self.combat.monsters).clone();
+        let target = match self.combat.monsters.get_mut(msg.target) {
+            Some(monster) => monster,
+            None => {
+                debug!("Invalid target: {}", msg.target);
+                send_result(&mut user.infos.conn, &MessageHeader::new(), ResultData::err("InvalidTarget",
+                                                                                         "Invalid target", None));
+                return None;
+            }
+        };
+        let attack = match Attack::get_by_id(&db_conn, msg.attack as i32).unwrap() {
+            Some(attack) => attack,
+            None => {
+                debug!("Invalid attack: {}", msg.attack);
+                send_result(&mut user.infos.conn, &MessageHeader::new(), ResultData::err("InvalidAttack",
+                                                                                         "Invalid attack", None));
+                return None;
+            }
+        };
+
+        let damage = math::attack(&monster.monster, monster.level as i32, &attack, None, target.monster.monster_type);
+        target.hp = target.hp.checked_sub(damage).unwrap_or(0);
+
+        let r_msg = AttackReceived {
+            header: MessageHeader::new(),
+            attack: msg.attack,
+            monster: data::Monster {
+                id: monster_ref.id(),
+                hp: monster.hp as u16,
+            },
+            target: data::Monster {
+                id: msg.target,
+                hp: target.hp as u16,
+            },
+            combat: self.combat.id,
+        };
+        user.infos.conn.send(r_msg.clone()).unwrap();
+        if let OpponentType::User(ref mut infos) = self.combat.opponent.ty {
+            infos.conn.send(r_msg.clone()).unwrap();
+        }
+
+        self.state = State::WaitOpponentAttack;
+        None
+    }
+
+    fn wait_opponent_attack(&mut self) -> Option<CombatResult> {
+        use db::models::attack::Attack;
+        use net::msg::combat::AttackReceived;
+        use net::msg::combat::attack_received as data;
+
+        let db_conn = self.combat.ctx.db.get_connection().unwrap();
+
+        let monster_ref = self.combat.opponent.current.expect("No monster?");
+        let monster = monster_ref.get(&self.combat.monsters).clone();
+
+        let (target, target_id, attack) = match self.combat.opponent.ty {
+            OpponentType::AI => {
+                let target_ref = self.combat.user.current.expect("No monster?");
+                let target = target_ref.get_mut(&mut self.combat.monsters);
+
+                let attack = Attack::get_by_id(&db_conn, 1).unwrap().expect("meh");
+
+                (target, target_ref.id(), attack)
+            }
+            OpponentType::User(ref mut infos) => {
+                let msg = match infos.receiver.recv().unwrap() {
+                    combat::Message::SendAttack(msg) => msg,
+                    msg => {
+                        debug!("Bad message received: {:?}", msg);
+                        return None;
+                    }
+                };
+
+                let target = match self.combat.monsters.get_mut(msg.target) {
+                    Some(monster) => monster,
+                    None => {
+                        debug!("Invalid target: {}", msg.target);
+                        send_result(&mut infos.conn, &MessageHeader::new(), ResultData::err("InvalidTarget",
+                                                                                                 "Invalid target", None));
+                        return None;
+                    }
+                };
+                let attack = match Attack::get_by_id(&db_conn, msg.attack as i32).unwrap() {
+                    Some(attack) => attack,
+                    None => {
+                        debug!("Invalid attack: {}", msg.attack);
+                        send_result(&mut infos.conn, &MessageHeader::new(), ResultData::err("InvalidAttack",
+                                                                                                 "Invalid attack", None));
+                        return None;
+                    }
+                };
+
+                (target, msg.target, attack)
+            }
+        };
+
+        let damage = math::attack(&monster.monster, monster.level as i32, &attack, None, target.monster.monster_type);
+        target.hp = target.hp.checked_sub(damage).unwrap_or(0);
+
+        let r_msg = AttackReceived {
+            header: MessageHeader::new(),
+            attack: attack.id as u32,
+            monster: data::Monster {
+                id: monster_ref.id(),
+                hp: monster.hp as u16,
+            },
+            target: data::Monster {
+                id: target_id,
+                hp: target.hp as u16,
+            },
+            combat: self.combat.id,
+        };
+        self.combat.user.infos.conn.send(r_msg.clone()).unwrap();
+        if let OpponentType::User(ref mut infos) = self.combat.opponent.ty {
+            infos.conn.send(r_msg.clone()).unwrap();
+        }
+
+        self.state = State::WaitUserAttack;
+        None
+    }
+}
+
 pub struct User {
     pub infos: UserInfos,
     pub monsters: Vec<MonsterRef>,
@@ -119,7 +291,7 @@ pub struct UserInfos {
     pub receiver: sync::Receiver<combat::Message>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Monster {
     pub monster: db::Monster,
     pub user_monster: Option<db::UserMonster>,
@@ -187,6 +359,14 @@ pub struct Monsters(Vec<Monster>);
 impl Monsters {
     pub fn new() -> Monsters {
         Monsters(Vec::new())
+    }
+
+    pub fn get(&self, id: u32) -> Option<&Monster> {
+        self.0.get(id as usize)
+    }
+
+    pub fn get_mut(&mut self, id: u32) -> Option<&mut Monster> {
+        self.0.get_mut(id as usize)
     }
 
     pub fn push(&mut self, monster: Monster) -> MonsterRef {

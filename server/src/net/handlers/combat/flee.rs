@@ -4,10 +4,22 @@ use net::msg::result::ResultData;
 use net::handlers::helpers::result::handle_with_result;
 
 pub fn handle(conn: &mut Connection, msg: Flee) {
-    handle_with_result(conn, &msg.header, |conn| {
-        match conn.session() {
-            Some(_) => { return ResultData::ok(None) },
-            None => { return ResultData::err("NotAuthenticated", "You are not authenticated on the server", None)}
-        }
+    handle_with_result(conn, &msg.header.clone(), |conn| {
+        use net::msg::combat::Message;
+
+        let session = match conn.session() {
+            Some(session) => session,
+            None => return ResultData::err("NotAuthenticated",
+                                           "You are not authenticated", None),
+        };
+        let user = session.user.get().expect("No user?");
+
+        let mut combat = match conn.ctx.get_combat(msg.combat) {
+            Some(combat) => combat,
+            None => return ResultData::err("InvalidCombat", "Invalid combat ID", None),
+        };
+        combat.send(user.id as u32, &Message::Flee(msg));
+
+        ResultData::ok(None)
     });
 }

@@ -63,6 +63,7 @@ impl CombatBuilder {
             id: id,
             ty: self.ty,
             env: self.env,
+            ctx: ctx,
             user: user,
             opponent: opponent,
             monsters: monsters,
@@ -77,6 +78,20 @@ impl CombatBuilder {
 pub struct CombatHandle {
     pub user: UserHandle,
     pub opponent: Option<UserHandle>,
+}
+
+impl CombatHandle {
+    pub fn send(&mut self, id: u32, msg: &Message) {
+        let msg = msg.clone();
+
+        if id == self.user.id {
+            self.user.sender.send(msg).unwrap()
+        } else if let Some(ref mut opponent) = self.opponent {
+            if id == opponent.id {
+                opponent.sender.send(msg).unwrap()
+            }
+        }
+    }
 }
 
 #[derive(Clone)]

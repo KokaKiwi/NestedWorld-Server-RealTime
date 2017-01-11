@@ -1,4 +1,4 @@
-#[derive(Debug, Clone, ToSql, FromSql)]
+#[derive(Debug, Clone, Copy, ToSql, FromSql)]
 #[postgres(name = "element_type")]
 pub enum ElementType {
     #[postgres(name = "water")]

@@ -45,6 +45,10 @@ impl Context {
     pub fn add_combat(&mut self, handle: CombatHandle) -> u32 {
         mutex_lock!(self.combats).insert(handle) as u32
     }
+
+    pub fn remove_combat(&mut self, id: u32) {
+        mutex_lock!(self.combats).entry(id as usize).remove();
+    }
 }
 
 pub type UserStore = HashMap<u32, Connection>;
