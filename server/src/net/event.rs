@@ -23,7 +23,7 @@ pub fn send_random_combat(conn: &mut Connection) {
         let time =std::time::Duration::from_millis(140 + between.ind_sample(&mut rng));
         mioco::sleep(time);
 
-        let mut db_conn = conn.ctx.db.get_connection().unwrap();
+        // let db_conn = conn.ctx.db.get_connection().unwrap();
 
         debug!("Lets create the monster");
         let wild_monster = WildMonster {

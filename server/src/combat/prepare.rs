@@ -31,10 +31,11 @@ pub fn get_user(conn: &mut Connection, db_conn: &mut db::Connection) -> Result<U
 pub fn add_user_monster(db_conn: &mut db::Connection, monsters: &[i32], builder: &mut builder::CombatBuilder) -> Result<u32, String> {
     let mut average_level : u32 = 0;
     for monster in monsters {
-        let user_monster = match UserMonster::get_by_id(&db_conn, *monster) {
+        let mut user_monster = match UserMonster::get_by_id(&db_conn, *monster) {
             Ok(Some(monster)) => monster,
             _ => return Err("User not sended the good id's !".into()),
         };
+        user_monster.monster.fetch(&db_conn).unwrap();
         builder.add_user_monster(&user_monster);
         average_level += user_monster.level as u32;
     }
