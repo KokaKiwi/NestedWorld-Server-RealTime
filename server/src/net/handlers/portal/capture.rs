@@ -123,7 +123,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
                users.get(&(opp as u32)).map(|conn| conn.try_clone().unwrap())
            } {
                Some(conn) => conn,
-               None => {
+               _ => {
                    send_result(conn,
                                &msg.header,
                                ResultData::err("internal", "Internal server error", None));
