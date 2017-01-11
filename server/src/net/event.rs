@@ -13,6 +13,7 @@ use rand::distributions::{IndependentSample, Range};
 use rand;
 
 pub fn send_random_combat(conn: &mut Connection) {
+    debug!("Starting the random combat !");
     let mut rng = rand::thread_rng();
     let between = Range::new(0, 140);
 
@@ -22,11 +23,13 @@ pub fn send_random_combat(conn: &mut Connection) {
 
         let mut db_conn = conn.ctx.db.get_connection().unwrap();
 
+        debug!("Lets create the monster");
         let wild_monster = match WildMonster::generate(&mut db_conn) {
             Ok(Some(monster)) => monster,
             _ => return,
         };
 
+        debug!("monster created");
         let msg = Available {
             header: MessageHeader::new(),
             origin: Origin::WildMonster {
@@ -42,7 +45,7 @@ pub fn send_random_combat(conn: &mut Connection) {
             continue;
           }
         };
-
+        debug!("sended request !");
         let msg = match rx.recv() {
           Ok(Message::Result(msg)) => msg,
           _ => {
@@ -50,13 +53,14 @@ pub fn send_random_combat(conn: &mut Connection) {
             continue;
           }
         };
-
+        debug!("recieve respond !");
         match msg.data {
           ResultData::Success(ref _data) => {
               let result: bool = fields::get(_data, "accept").unwrap_or(false);
               if result {
                   let monsters: Vec<i32> = fields::get(_data, "monsters").unwrap_or(vec![]);
                   if monsters.len() > 0 {
+                      debug!("GO TO THE COMBAT !");
                       prepare_wild_combat(conn, &monsters, wild_monster.monster.id);
                   }
               }
