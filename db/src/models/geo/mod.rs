@@ -21,7 +21,7 @@ pub struct Portal {
 impl Model for Portal {
     fn get_by_id(conn: &::postgres::Connection, id: i32) -> ::postgres::Result<Option<Portal>> {
         let query = r#"
-            SELECT point, type, created, captured, duration, catching_end
+            SELECT point, type, created, captured, duration, catching_end, captured_by, umonster_on, monster_on
             FROM portals
             WHERE id = $1
         "#;
