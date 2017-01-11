@@ -26,7 +26,10 @@ pub fn send_random_combat(conn: &mut Connection) {
         debug!("Lets create the monster");
         let wild_monster = match WildMonster::generate(&mut db_conn) {
             Ok(Some(monster)) => monster,
-            _ => return,
+            _ => {
+                debug!("rtsittrist")
+                return
+            },
         };
 
         debug!("monster created");
