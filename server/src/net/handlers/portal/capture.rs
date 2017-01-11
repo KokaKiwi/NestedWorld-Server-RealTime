@@ -12,6 +12,7 @@ use combat::math::coefficient;
 use combat::prepare::prepare_portal_combat;
 
 pub fn handle(conn: &mut Connection, msg: Capture) {
+    debug!("stat to capture a portal");
     let mut msg = msg;
     let uuid = msg.header.ensure_id();
 
