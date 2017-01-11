@@ -38,7 +38,7 @@ pub fn send_random_combat(conn: &mut Connection) {
         let rx = match conn.send_request(msg) {
           Ok(rx) => rx,
           Err(e) => {
-            debug!("{}", e);
+            debug!("Wild monster : {}", e);
             continue;
           }
         };
