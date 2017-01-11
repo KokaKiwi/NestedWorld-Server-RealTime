@@ -135,7 +135,7 @@ impl CombatLoop {
     }
 
     fn wait_user_attack(&mut self) -> Option<CombatResult> {
-        use db::models::attack::Attack;
+        use db::models::attack::{Attack, AttackType};
         use net::msg::combat::AttackReceived;
         use net::msg::combat::attack_received as data;
 
@@ -152,8 +152,9 @@ impl CombatLoop {
 
         let monster_ref = user.current.expect("No monster?");
         let monster = monster_ref.get(&self.combat.monsters).clone();
-        let target = match self.combat.monsters.get_mut(msg.target) {
-            Some(monster) => monster,
+
+        let target = match self.combat.monsters.get(msg.target) {
+            Some(monster) => monster.clone(),
             None => {
                 debug!("Invalid target: {}", msg.target);
                 send_result(&mut user.infos.conn, &MessageHeader::new(), ResultData::err("InvalidTarget",
@@ -171,8 +172,17 @@ impl CombatLoop {
             }
         };
 
-        let damage = math::attack(&monster.monster, monster.level as i32, &attack, None, target.monster.monster_type);
-        target.hp = target.hp.checked_sub(damage).unwrap_or(0);
+        let damage = math::attack(&monster.monster, monster.level as i32, &attack, Some(monster.hp), target.monster.monster_type);
+        match attack.attack_type {
+            AttackType::Attack | AttackType::AttackSp => {
+                let target = self.combat.monsters.get_mut(msg.target).unwrap();
+                target.hp = target.hp.checked_sub(damage).unwrap_or(0);
+            }
+            _ => {
+                let target = monster_ref.get_mut(&mut self.combat.monsters);
+                target.hp += damage;
+            }
+        }
 
         let r_msg = AttackReceived {
             header: MessageHeader::new(),
@@ -197,7 +207,7 @@ impl CombatLoop {
     }
 
     fn wait_opponent_attack(&mut self) -> Option<CombatResult> {
-        use db::models::attack::Attack;
+        use db::models::attack::{Attack, AttackType};
         use net::msg::combat::AttackReceived;
         use net::msg::combat::attack_received as data;
 
@@ -209,7 +219,7 @@ impl CombatLoop {
         let (target, target_id, attack) = match self.combat.opponent.ty {
             OpponentType::AI => {
                 let target_ref = self.combat.user.current.expect("No monster?");
-                let target = target_ref.get_mut(&mut self.combat.monsters);
+                let target = target_ref.get(&mut self.combat.monsters).clone();
 
                 let attack = Attack::get_by_id(&db_conn, 1).unwrap().expect("meh");
 
@@ -224,8 +234,8 @@ impl CombatLoop {
                     }
                 };
 
-                let target = match self.combat.monsters.get_mut(msg.target) {
-                    Some(monster) => monster,
+                let target = match self.combat.monsters.get(msg.target) {
+                    Some(monster) => monster.clone(),
                     None => {
                         debug!("Invalid target: {}", msg.target);
                         send_result(&mut infos.conn, &MessageHeader::new(), ResultData::err("InvalidTarget",
@@ -247,8 +257,17 @@ impl CombatLoop {
             }
         };
 
-        let damage = math::attack(&monster.monster, monster.level as i32, &attack, None, target.monster.monster_type);
-        target.hp = target.hp.checked_sub(damage).unwrap_or(0);
+        let damage = math::attack(&monster.monster, monster.level as i32, &attack, Some(monster.hp), target.monster.monster_type);
+        match attack.attack_type {
+            AttackType::Attack | AttackType::AttackSp => {
+                let target = self.combat.monsters.get_mut(target_id).unwrap();
+                target.hp = target.hp.checked_sub(damage).unwrap_or(0);
+            }
+            _ => {
+                let target = monster_ref.get_mut(&mut self.combat.monsters);
+                target.hp += damage;
+            }
+        }
 
         let r_msg = AttackReceived {
             header: MessageHeader::new(),
@@ -302,6 +321,7 @@ pub struct Monster {
     pub user_monster: Option<db::UserMonster>,
     pub name: String,
     pub level: u32,
+    pub max_hp: u32,
     pub hp: u32,
 }
 
@@ -325,11 +345,13 @@ impl Monster {
 
 impl From<db::UserMonster> for Monster {
     fn from(monster: db::UserMonster) -> Monster {
+        let m_monster = monster.monster.get().expect("No monster ?!").clone();
         Monster {
             name: monster.surname.clone(),
             level: monster.level as u32,
-            hp: monster.monster.get().expect("No monster ?!").hp as u32,
-            monster: monster.monster.get().expect("No monster ?!").clone(),
+            hp: m_monster.hp as u32,
+            max_hp: m_monster.hp as u32,
+            monster: m_monster,
             user_monster: Some(monster),
         }
     }

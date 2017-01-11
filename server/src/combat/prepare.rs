@@ -4,7 +4,6 @@ use db::models::monster::Monster;
 use db::models::user::User;
 use db::models::utils::Model;
 use net::conn::Connection;
-use net::handlers::helpers::result::send_result;
 
 mod db {
     pub use db::Connection;

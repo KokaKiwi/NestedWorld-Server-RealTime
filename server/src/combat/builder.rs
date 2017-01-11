@@ -200,6 +200,7 @@ impl Into<run::Monster> for Monster {
             name: self.name,
             level: self.level,
             hp: self.monster.hp as u32,
+            max_hp: self.monster.hp as u32,
             monster: self.monster,
         }
     }

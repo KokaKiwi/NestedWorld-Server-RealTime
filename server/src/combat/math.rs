@@ -30,7 +30,7 @@ pub fn attack(monster: &Monster, level: i32, attack: &Attack, damage: Option<u32
     }
     else {
         match damage {
-            Some(dam) => return dam.checked_sub((monster.defense * level as f64 * multiplier) as u32).unwrap_or(0),
+            Some(dam) => return dam.checked_add((monster.defense * level as f64 * multiplier * 0.25) as u32).unwrap_or(0),
             None => return 0
         }
     }
