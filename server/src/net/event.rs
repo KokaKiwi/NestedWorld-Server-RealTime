@@ -27,8 +27,8 @@ pub fn send_random_combat(conn: &mut Connection) {
         let wild_monster = match WildMonster::generate(&mut db_conn) {
             Ok(Some(monster)) => monster,
             _ => {
-                debug!("rtsittrist")
-                return
+                debug!("rtsittrist");
+                return;
             },
         };
 
