@@ -126,7 +126,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
                _ => {
                    send_result(conn,
                                &msg.header,
-                               ResultData::err("internal", "Internal server error", None));
+                               ResultData::err("internal", "Internal server error no Connection", None));
                    debug!("no connexion :(");
                    return;
                }
@@ -136,7 +136,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
                _ => {
                    send_result(conn,
                                &msg.header,
-                               ResultData::err("internal", "Internal server error", None));
+                               ResultData::err("internal", "Internal server error no monster", None));
                    debug!("no monster on :(");
                    return;
                }
@@ -146,7 +146,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
                _ => {
                    send_result(conn,
                                &msg.header,
-                               ResultData::err("internal", "Internal server error", None));
+                               ResultData::err("internal", "Internal server error no id", None));
                    debug!("bad id !");
                    return;
                }
