@@ -131,7 +131,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
                    return;
                }
            };
-           let monster_on = match portal.monster_on {
+           let umonster_on = match portal.umonster_on {
                Some(monster) => monster,
                _ => {
                    send_result(conn,
@@ -141,7 +141,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
                    return;
                }
            };
-           let opp_umonster = match UserMonster::get_by_id(&db_conn, monster_on) {
+           let opp_umonster = match UserMonster::get_by_id(&db_conn, umonster_on) {
                Ok(Some(monster)) => monster,
                _ => {
                    send_result(conn,
