@@ -120,20 +120,6 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
     send_result(conn, &msg.header, ResultData::ok(Some(data)));
     match portal.captured_by {
         Some(_user) =>  {
-            let opponent_conn = match {
-               let opp = portal.captured_by.unwrap();
-               let users = conn.ctx.users.lock().unwrap_or_else(|e| e.into_inner());
-               users.get(&(opp as u32)).map(|conn| conn.try_clone().unwrap())
-           } {
-               Some(conn) => conn,
-               _ => {
-                   send_result(conn,
-                               &msg.header,
-                               ResultData::err("internal", "Internal server error no Connection", None));
-                   debug!("no connexion :(");
-                   return;
-               }
-           };
            let umonster_on = match portal.umonster_on {
                Some(monster) => monster,
                _ => {
