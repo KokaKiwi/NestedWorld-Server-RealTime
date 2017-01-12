@@ -7,12 +7,8 @@ use net::msg::combat::Available;
 use net::msg::combat::available::Origin;
 use net::conn::Connection;
 use net::msg::MessageHeader;
-use net::msg::ResultMessage;
 use net::msg::Message;
-use net::msg::utils::fields;
 use chrono::offset::utc::UTC;
-use chrono::Duration;
-use std::ops::Add;
 
 mod db {
     pub use db::Connection;
@@ -56,20 +52,18 @@ pub fn add_user_monster(db_conn: &mut db::Connection, monsters: &[i32], builder:
 }
 
 pub fn add_opponent_monster(db_conn: &mut db::Connection, monsters: &[i32], builder: &mut builder::CombatBuilder) {
-    for monster in monsters {
-        match UserMonster::get_by_id(db_conn, *monster) {
-            Ok(Some(mut monster)) => {
-                match monster.monster.get_or_fetch(db_conn) {
-                    Ok(Some(opp_monster)) => {
-                        builder.add_opponent_monster (
-                            builder::Monster {
-                                 monster: opp_monster.clone(),
-                                 name: monster.surname,
-                                 level: monster.level as u32
-                             });
-                         },
-                    _ => {debug!("opponent monster doesn't exist")}
-                }
+    for &monster in monsters {
+        match UserMonster::get_by_id(db_conn, monster) {
+            Ok(Some(mut user_monster)) => {
+                let monster = user_monster.monster.fetch(db_conn)
+                    .unwrap().expect("No monster?")
+                    .clone();
+                builder.add_opponent_monster (builder::Monster {
+                    monster: monster.clone(),
+                    user_monster: Some(user_monster.clone()),
+                    name: user_monster.surname,
+                    level: user_monster.level as u32
+                });
             },
             _ => {debug!("opponent monster id is not correct !")},
         };
@@ -134,6 +128,7 @@ pub fn prepare_wild_combat(conn: &mut Connection, monsters: &[i32], ai_monster: 
     let monster_name = opp_db_monster.name.clone();
     let opp_monster = builder::Monster {
         monster: opp_db_monster.clone(),
+        user_monster: None,
         name: monster_name,
         level:average_level};
     builder.add_opponent_monster(opp_monster);

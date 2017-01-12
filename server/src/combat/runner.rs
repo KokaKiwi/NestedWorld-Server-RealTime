@@ -4,8 +4,9 @@ use db::models::utils::Model;
 use mioco::sync::mpsc as sync;
 use net::conn::Connection;
 use net::handlers::helpers::result::send_result;
-use net::msg::MessageHeader;
+use net::msg::{Message, MessageFull, MessageHeader};
 use net::msg::combat;
+use net::msg::combat::monster_ko::Capture;
 use net::msg::result::ResultData;
 use std::time::Duration;
 use super::result::CombatResult;
@@ -25,17 +26,6 @@ pub struct Combat {
     pub user: User,
     pub opponent: Opponent,
     pub monsters: Monsters,
-}
-
-#[derive(Debug, Clone)]
-enum State {
-    WaitUserAttack,
-    WaitOpponentAttack,
-}
-
-struct CombatLoop {
-    combat: Combat,
-    state: State,
 }
 
 impl Combat {
@@ -122,6 +112,17 @@ impl Combat {
     }
 }
 
+#[derive(Debug, Clone)]
+enum State {
+    WaitUserAttack,
+    WaitOpponentAttack,
+}
+
+struct CombatLoop {
+    combat: Combat,
+    state: State,
+}
+
 impl CombatLoop {
     fn run(mut self) -> CombatResult {
         loop {
@@ -142,8 +143,7 @@ impl CombatLoop {
 
         let db_conn = self.combat.ctx.db.get_connection().unwrap();
 
-        let ref mut user = self.combat.user;
-        let msg = match user.infos.receiver.recv().unwrap() {
+        let msg = match self.combat.user.infos.receiver.recv().unwrap() {
             combat::Message::SendAttack(msg) => msg,
             msg => {
                 debug!("Bad message received: {:?}", msg);
@@ -151,14 +151,14 @@ impl CombatLoop {
             }
         };
 
-        let monster_ref = user.current.expect("No monster?");
+        let monster_ref = self.combat.user.current.expect("No monster?");
         let monster = monster_ref.get(&self.combat.monsters).clone();
 
         let target = match self.combat.monsters.get(msg.target) {
             Some(monster) => monster.clone(),
             None => {
                 debug!("Invalid target: {}", msg.target);
-                send_result(&mut user.infos.conn, &MessageHeader::new(), ResultData::err("InvalidTarget",
+                send_result(&mut self.combat.user.infos.conn, &MessageHeader::new(), ResultData::err("InvalidTarget",
                                                                                          "Invalid target", None));
                 return None;
             }
@@ -167,7 +167,7 @@ impl CombatLoop {
             Some(attack) => attack,
             None => {
                 debug!("Invalid attack: {}", msg.attack);
-                send_result(&mut user.infos.conn, &MessageHeader::new(), ResultData::err("InvalidAttack",
+                send_result(&mut self.combat.user.infos.conn, &MessageHeader::new(), ResultData::err("InvalidAttack",
                                                                                          "Invalid attack", None));
                 return None;
             }
@@ -198,9 +198,117 @@ impl CombatLoop {
             },
             combat: self.combat.id,
         };
-        user.infos.conn.send(r_msg.clone()).unwrap();
+        self.combat.user.infos.conn.send(r_msg.clone()).unwrap();
         if let OpponentType::User(ref mut infos) = self.combat.opponent.ty {
             infos.conn.send(r_msg.clone()).unwrap();
+        }
+
+        if target.is_ko() {
+            let ko = combat::monster_ko::MonsterKo {
+                header: MessageHeader::new(),
+                combat: self.combat.id,
+                monster: msg.target,
+            };
+
+            match self.combat.opponent.ty {
+                OpponentType::AI => {
+                    loop {
+                        let rx = self.combat.user.infos.conn.send_request(ko.clone()).unwrap();
+
+                        match rx.recv().unwrap() {
+                            Message::Combat(
+                                combat::Message::MonsterKo(
+                                    combat::monster_ko::Message::Capture(msg)))
+                                => {
+                                    return self.capture(msg);
+                                }
+                            msg => {
+                                debug!("Unexpected message: {:?}", msg);
+                                send_result(&mut self.combat.user.infos.conn,
+                                            &msg.header(),
+                                            ResultData::err("invalid-msg",
+                                                            "Unexpected message", None));
+
+                            }
+                        }
+                    }
+                }
+                OpponentType::User(_) => {
+                    let mut conn = match self.combat.opponent.ty {
+                        OpponentType::User(ref infos) => infos.conn.try_clone().unwrap(),
+                        _ => unreachable!(),
+                    };
+                    let monsters = self.combat.opponent.monsters.iter()
+                        .map(|&item| item)
+                        .collect::<Vec<_>>();
+
+                    if monsters.len() > 0 {
+                        loop {
+                            let rx = conn.send_request(ko.clone()).unwrap();
+
+                            match rx.recv().unwrap() {
+                                Message::Combat(
+                                    combat::Message::MonsterKo(
+                                        combat::monster_ko::Message::Replace(msg)))
+                                    => {
+                                        let monster_ref = self.combat.opponent.monsters.iter()
+                                            .filter_map(|monster_ref| {
+                                                let monster = monster_ref.get(&self.combat.monsters);
+                                                if let Some(ref user_monster) = monster.user_monster {
+                                                    if user_monster.id as u32 == msg.user_monster_id && !monster.is_ko() {
+                                                        Some(monster_ref)
+                                                    } else {
+                                                        None
+                                                    }
+                                                } else {
+                                                    None
+                                                }
+                                            })
+                                        .next();
+                                        match monster_ref {
+                                            Some(&monster_ref) => {
+                                                self.combat.opponent.current = Some(monster_ref);
+
+                                                let monster = monster_ref.get(&self.combat.monsters);
+                                                let replaced = combat::MonsterReplaced {
+                                                    header: MessageHeader::new(),
+                                                    combat: self.combat.id,
+                                                    monster: monster.as_data(monster_ref.id()),
+                                                };
+
+                                                self.combat.user.infos.conn.send(replaced.clone()).unwrap();
+                                                conn.send(replaced.clone()).unwrap();
+
+                                                break;
+                                            }
+                                            None => {
+                                                debug!("Invalid replace monster: {}", msg.user_monster_id);
+                                                send_result(&mut conn,
+                                                            &msg.header(),
+                                                            ResultData::err("InvalidMonster",
+                                                                            "Invalid UserMonster ID", None));
+                                            }
+                                        }
+                                    }
+                                Message::Combat(
+                                    combat::Message::Flee(msg))
+                                    => {
+                                        // TODO: End combat
+                                    }
+                                msg => {
+                                    debug!("Unexpected message: {:?}", msg);
+                                    send_result(&mut conn,
+                                                &msg.header(),
+                                                ResultData::err("invalid-msg",
+                                                                "Unexpected message", None));
+                                }
+                            }
+                        }
+                    } else {
+                        return self.end(true);
+                    }
+                }
+            }
         }
 
         self.state = State::WaitOpponentAttack;
@@ -243,7 +351,7 @@ impl CombatLoop {
                     None => {
                         debug!("Invalid target: {}", msg.target);
                         send_result(&mut infos.conn, &MessageHeader::new(), ResultData::err("InvalidTarget",
-                                                                                                 "Invalid target", None));
+                                                                                            "Invalid target", None));
                         return None;
                     }
                 };
@@ -252,7 +360,7 @@ impl CombatLoop {
                     None => {
                         debug!("Invalid attack: {}", msg.attack);
                         send_result(&mut infos.conn, &MessageHeader::new(), ResultData::err("InvalidAttack",
-                                                                                                 "Invalid attack", None));
+                                                                                            "Invalid attack", None));
                         return None;
                     }
                 };
@@ -291,8 +399,169 @@ impl CombatLoop {
             infos.conn.send(r_msg.clone()).unwrap();
         }
 
+        let target = self.combat.monsters.get(target_id).unwrap().clone();
+        if target.is_ko() {
+            let ko = combat::monster_ko::MonsterKo {
+                header: MessageHeader::new(),
+                combat: self.combat.id,
+                monster: target_id,
+            };
+
+            if let OpponentType::User(ref mut infos) = self.combat.opponent.ty {
+                infos.conn.send(ko.clone()).unwrap();
+            }
+
+            let monsters = self.combat.user.monsters.iter().collect::<Vec<_>>();
+            if monsters.len() > 0 {
+                loop {
+                    let rx = self.combat.user.infos.conn.send_request(ko.clone()).unwrap();
+
+                    match rx.recv().unwrap() {
+                        Message::Combat(
+                            combat::Message::MonsterKo(
+                                combat::monster_ko::Message::Replace(msg)))
+                            => {
+                                let monster_ref = self.combat.user.monsters.iter()
+                                    .filter_map(|monster_ref| {
+                                        let monster = monster_ref.get(&self.combat.monsters);
+                                        if let Some(ref user_monster) = monster.user_monster {
+                                            if user_monster.id as u32 == msg.user_monster_id && !monster.is_ko() {
+                                                Some(monster_ref)
+                                            } else {
+                                                None
+                                            }
+                                        } else {
+                                            None
+                                        }
+                                    })
+                                .next();
+                                match monster_ref {
+                                    Some(&monster_ref) => {
+                                        self.combat.user.current = Some(monster_ref);
+
+                                        let monster = monster_ref.get(&self.combat.monsters);
+                                        let replaced = combat::MonsterReplaced {
+                                            header: MessageHeader::new(),
+                                            combat: self.combat.id,
+                                            monster: monster.as_data(monster_ref.id()),
+                                        };
+
+                                        self.combat.user.infos.conn.send(replaced.clone()).unwrap();
+                                        if let OpponentType::User(ref mut infos) = self.combat.opponent.ty {
+                                            infos.conn.send(replaced.clone()).unwrap();
+                                        }
+
+                                        break;
+                                    }
+                                    None => {
+                                        debug!("Invalid replace monster: {}", msg.user_monster_id);
+                                        send_result(&mut self.combat.user.infos.conn,
+                                                    &msg.header(),
+                                                    ResultData::err("InvalidMonster",
+                                                                    "Invalid UserMonster ID", None));
+                                    }
+                                }
+                            }
+                        Message::Combat(
+                            combat::Message::Flee(msg))
+                            => {
+                                // TODO: End combat
+                            }
+                        msg => {
+                            debug!("Unexpected message: {:?}", msg);
+                            send_result(&mut self.combat.user.infos.conn,
+                                        &msg.header(),
+                                        ResultData::err("invalid-msg",
+                                                        "Unexpected message", None));
+                        }
+                    }
+                }
+            }
+        } else {
+            return self.end(false);
+        }
+
         self.state = State::WaitUserAttack;
         None
+    }
+
+    fn capture(&mut self, msg: Capture) -> Option<CombatResult> {
+        if msg.capture {
+            let db_conn = self.combat.user.infos.conn.ctx.db.get_connection().unwrap();
+            let monster = self.combat.opponent.current.expect("No monster?").get(&self.combat.monsters);
+
+            let name = msg.name.unwrap_or(monster.name.clone());
+
+            db_conn.execute(r#"
+                INSERT INTO user_monsters (user_id, monster_id, surname, experience, level)
+                VALUES ($1, $2, $3, $4, $5)
+            "#, &[
+                &self.combat.user.infos.user.id,
+                &monster.monster.id,
+                &name,
+                &0,
+                &monster.level,
+            ]).unwrap();
+        }
+
+        self.end(true)
+    }
+
+    fn end(&mut self, win: bool) -> Option<CombatResult> {
+        use super::math;
+
+        let ref monsters = self.combat.opponent.monsters;
+        let average_level = monsters.iter()
+            .map(|monster_ref| monster_ref.get(&self.combat.monsters))
+            .map(|monster| monster.level)
+            .fold(0, |total, level| total + level) / monsters.len() as u32;
+
+        let monster = self.combat.user.current.expect("No monster?").get(&self.combat.monsters);
+        let user_monster = monster.user_monster.as_ref().expect("No user monster?");
+        let mut level = user_monster.level;
+        let mut experience = user_monster.experience + math::experience(win, average_level);
+        if experience > experience * (experience / 5) + 10 {
+            experience = experience - experience * (experience / 5) + 10;
+            level += 1;
+        }
+
+        let end = combat::End {
+            header: MessageHeader::new(),
+            combat: self.combat.id,
+            status: if win { "win".into() } else { "lose".into() },
+            stats: combat::end::Stats {
+                id: user_monster.id as u32,
+                exp: (experience - user_monster.experience) as u32,
+                level: (level - user_monster.level) as u8,
+            },
+        };
+        self.combat.user.infos.conn.send(end).unwrap();
+
+        if let OpponentType::User(ref mut infos) = self.combat.opponent.ty {
+            let end = combat::End {
+                header: MessageHeader::new(),
+                combat: self.combat.id,
+                status: if !win { "win".into() } else { "lose".into() },
+                stats: combat::end::Stats {
+                    id: 0,
+                    exp: 0,
+                    level: 0,
+                },
+            };
+            infos.conn.send(end).unwrap();
+        }
+
+        let user_monsters = self.combat.user.monsters.iter()
+            .map(|monster_ref| monster_ref.get(&self.combat.monsters))
+            .map(|monster| monster.user_monster.as_ref().expect("No user monster?").clone())
+            .collect::<Vec<_>>();
+
+        Some(CombatResult {
+            user: self.combat.user.infos.user.clone(),
+            monsters: user_monsters,
+            win: win,
+            average_lvl: average_level,
+        })
     }
 }
 

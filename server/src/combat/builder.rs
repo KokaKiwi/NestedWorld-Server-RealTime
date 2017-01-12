@@ -189,6 +189,7 @@ impl UserInfos {
 #[derive(Debug)]
 pub struct Monster {
     pub monster: db::Monster,
+    pub user_monster: Option<db::UserMonster>,
     pub name: String,
     pub level: u32,
 }
@@ -196,7 +197,7 @@ pub struct Monster {
 impl Into<run::Monster> for Monster {
     fn into(self) -> run::Monster {
         run::Monster {
-            user_monster: None,
+            user_monster: self.user_monster,
             name: self.name,
             level: self.level,
             hp: self.monster.hp as u32,
