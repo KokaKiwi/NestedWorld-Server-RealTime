@@ -41,6 +41,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
             send_result(conn,
                         &msg.header,
                         ResultData::err("internal", "Internal server error", None));
+            debug!("no umonster");
             return;
         }
 
@@ -51,6 +52,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
              send_result(conn,
                          &msg.header,
                          ResultData::err("internal", "internal server error", None));
+             debug!("no user");
              return;
          }
     };
@@ -62,6 +64,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
                     send_result(conn,
                                 &msg.header,
                                 ResultData::err("internal", "Internal server error", None));
+                                debug!("no umonster");
                     return;
                 }
             };
@@ -151,7 +154,7 @@ pub fn handle(conn: &mut Connection, msg: Capture) {
                    return;
                }
            };
-            prepare_portal_combat(conn, umonster.id, opp_umonster.id, portal.id, Some(opponent_conn), uuid);
+            prepare_portal_combat(conn, umonster.id, opp_umonster.id, portal.id, None, uuid);
         }
         _ => {},
     }
