@@ -211,6 +211,7 @@ pub fn prepare_portal_combat(user_conn: &mut Connection, user_monster: i32, opp_
     let mut builder = builder::CombatBuilder::new(id, user_infos, opponent_type,
                                                   "dungeon", "city");
 
+      ::mioco::sleep(::std::time::Duration::from_millis(1000));
       let msg = Available {
           header: MessageHeader::new(),
           origin: Origin::Portal {
