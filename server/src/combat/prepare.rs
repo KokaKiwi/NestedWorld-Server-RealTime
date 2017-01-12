@@ -26,7 +26,7 @@ pub fn get_user(conn: &mut Connection, db_conn: &db::Connection) -> Result<User,
     };
     let id : i32 = match session.user.get() {
         Some(user) => user.id,
-        _ => return Err("Internal server error".into()),
+        _ => return Err("Internal server error2".into()),
     };
     let user = match User::get_by_id(&db_conn, id) {
         Ok(Some(user)) => user,
